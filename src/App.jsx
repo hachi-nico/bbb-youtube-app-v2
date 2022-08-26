@@ -1,13 +1,26 @@
-import {useState} from 'react'
+import React from 'react'
+import {BrowserRouter, Switch, Route, Link} from 'react-router-dom'
 
-function App() {
-  const [count, setCount] = useState(0)
+import MainLayout from './layouts/MainLayout'
+import Beranda from './pages/Beranda'
 
+export default function App() {
   return (
-    <div>
-      <h2>hiii</h2>
-    </div>
+    <RouterWrapper>
+      <MainLayout />
+    </RouterWrapper>
   )
 }
 
-export default App
+const RouterWrapper = ({children}) => {
+  return (
+    <BrowserRouter>
+      {children}
+      <Switch>
+        <Route exact path="/">
+          <Beranda />
+        </Route>
+      </Switch>
+    </BrowserRouter>
+  )
+}
