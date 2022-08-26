@@ -6,21 +6,22 @@ import Beranda from './pages/Beranda'
 
 export default function App() {
   return (
-    <RouterWrapper>
-      <MainLayout />
-    </RouterWrapper>
+    <BrowserRouter>
+      <MainPages />
+    </BrowserRouter>
   )
 }
 
-const RouterWrapper = ({children}) => {
+const MainPages = () => {
   return (
     <BrowserRouter>
-      {children}
-      <Switch>
-        <Route exact path="/">
-          <Beranda />
-        </Route>
-      </Switch>
+      <MainLayout>
+        <Switch>
+          <Route exact path="/">
+            <Beranda />
+          </Route>
+        </Switch>
+      </MainLayout>
     </BrowserRouter>
   )
 }
