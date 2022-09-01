@@ -4,18 +4,20 @@ import Box from '@mui/material/Box'
 import CssBaseline from '@mui/material/CssBaseline'
 import Drawer from '@mui/material/Drawer'
 import IconButton from '@mui/material/IconButton'
-import InboxIcon from '@mui/icons-material/MoveToInbox'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
-import MailIcon from '@mui/icons-material/Mail'
 import MenuIcon from '@mui/icons-material/Menu'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 
-import "./MainLayout.css"
+import LayersIcon from '@mui/icons-material/Layers'
+import ArticleIcon from '@mui/icons-material/Article'
+import BackupIcon from '@mui/icons-material/Backup'
+import GroupIcon from '@mui/icons-material/Group'
+import LogoutIcon from '@mui/icons-material/Logout'
 
 const drawerWidth = 240
 
@@ -26,21 +28,40 @@ function ResponsiveDrawer({children, window}) {
     setMobileOpen(!mobileOpen)
   }
 
+  const adminMenuList = [
+    {
+      label: 'Antrian',
+      icon: <LayersIcon />,
+    },
+    {
+      label: 'Laporan',
+      icon: <ArticleIcon />,
+    },
+    {
+      label: 'Upload',
+      icon: <BackupIcon />,
+    },
+    {
+      label: 'Managemen Akun',
+      icon: <GroupIcon />,
+    },
+    {
+      label: 'Keluar',
+      icon: <LogoutIcon />,
+    },
+  ]
+
   const drawer = (
-    <>
-      <List>
-        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    </>
+    <List>
+      {adminMenuList.map((item, index) => (
+        <ListItem key={index} disablePadding>
+          <ListItemButton>
+            <ListItemIcon>{item.icon}</ListItemIcon>
+            <ListItemText primary={item.label} />
+          </ListItemButton>
+        </ListItem>
+      ))}
+    </List>
   )
 
   const container =
