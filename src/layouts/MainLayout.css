@@ -1,4 +1,8 @@
 .headerDrawerHeading {
-  font-size: 18px;
-  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+}
+.userInfoContainer {
+  bottom: 0;
+  position: absolute;
 }
