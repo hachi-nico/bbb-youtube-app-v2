@@ -6,6 +6,7 @@ import CssBaseline from '@mui/material/CssBaseline'
 import Drawer from '@mui/material/Drawer'
 import Toolbar from '@mui/material/Toolbar'
 import Divider from '@mui/material/Divider'
+import Link from '@mui/material/Link'
 
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
@@ -25,68 +26,77 @@ import BottomNavigationAction from '@mui/material/BottomNavigationAction'
 
 import './MainLayout.css'
 import {indigo} from '../config/color'
+import {Link as RouterLink} from 'react-router-dom'
 
 const drawerWidth = 240
 
-function ResponsiveDrawer({children, window}) {
-  const [bottomNavValue, setBottomNavValue] = useState('Antrian')
-  const [sideNavValue, setSideNavValue] = useState(0)
+function MainLayout({children}) {
+  const [navValue, setNavValue] = useState('Antrian')
 
-  const handleChange = (event, newValue) => {
-    setBottomNavValue(newValue)
+  const handleMobileNav = (event, newValue) => {
+    setNavValue(newValue)
   }
 
   const adminMenuList = [
     {
       label: 'Antrian',
       icon: <LayersIcon />,
+      route: '/',
     },
     {
       label: 'Laporan',
       icon: <ArticleIcon />,
+      route: '/laporan',
     },
     {
       label: 'Upload',
       icon: <BackupIcon />,
+      route: '/upload',
     },
     {
       label: 'User',
       icon: <GroupIcon />,
+      route: '/user',
     },
     {
       label: 'Keluar',
       icon: <LogoutIcon />,
+      route: '/keluar',
     },
   ]
 
-  const drawer = (
+  const desktopDrawerItem = (
     <List sx={{mt: 2}}>
       {adminMenuList.map((item, index) => {
         const isActiveColor =
-          sideNavValue == index ? {color: '#fff'} : {color: '#000'}
+          navValue == item.label ? {color: '#fff'} : {color: '#000'}
         const isActiveBgColor =
-          sideNavValue == index ? {bgcolor: indigo} : {bgcolor: '#fff'}
+          navValue == item.label ? {bgcolor: indigo} : {bgcolor: '#fff'}
 
         return (
-          <ListItem key={index} disablePadding>
-            <ListItemButton
-              onClick={() => setSideNavValue(index)}
-              sx={{
-                ...isActiveBgColor,
-                '&:hover': {
-                  backgroundColor:
-                    sideNavValue == index ? indigo : 'rgba(0,0,0,0.05)',
-                },
-              }}
-            >
-              <ListItemIcon sx={isActiveColor}>{item.icon}</ListItemIcon>
-              <ListItemText sx={isActiveColor} primary={item.label} />
-            </ListItemButton>
-          </ListItem>
+          <Link to={item.route}>
+            <ListItem key={index} disablePadding>
+              <ListItemButton
+                onClick={() => setNavValue(item.label)}
+                sx={{
+                  ...isActiveBgColor,
+                  '&:hover': {
+                    backgroundColor:
+                      navValue == item.label ? indigo : 'rgba(0,0,0,0.05)',
+                  },
+                }}
+              >
+                <ListItemIcon sx={isActiveColor}>{item.icon}</ListItemIcon>
+                <ListItemText sx={isActiveColor} primary={item.label} />
+              </ListItemButton>
+            </ListItem>
+          </Link>
         )
       })}
     </List>
   )
+
+  const mobileDrawerRouter = <Link to="/" />
 
   return (
     <Box sx={{display: 'flex'}} className="removeBoxPadding">
@@ -112,7 +122,7 @@ function ResponsiveDrawer({children, window}) {
             </p>
           </Box>
           <Divider />
-          {drawer}
+          {desktopDrawerItem}
           <div className="userInfoContainer">
             <Divider />
             <div
@@ -155,8 +165,8 @@ function ResponsiveDrawer({children, window}) {
           },
           display: {md: 'none'},
         }}
-        value={bottomNavValue}
-        onChange={handleChange}
+        value={navValue}
+        onChange={handleMobileNav}
       >
         {adminMenuList.map((item, i) => (
           <BottomNavigationAction
@@ -172,4 +182,4 @@ function ResponsiveDrawer({children, window}) {
   )
 }
 
-export default ResponsiveDrawer
+export default MainLayout
