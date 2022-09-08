@@ -96,7 +96,7 @@ function MainLayout({children}) {
   )
 
   return (
-    <Box sx={{display: 'flex'}} className="removeBoxPadding">
+    <Box sx={{display: 'flex', flex:1}} className="removeBoxPadding">
       <CssBaseline />
       {/* Section Top Bar Mobile */}
       <AppBar position="fixed" sx={{display: {md: 'none'}, bgcolor: indigo}}>

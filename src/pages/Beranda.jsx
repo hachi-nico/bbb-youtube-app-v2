@@ -1,8 +1,10 @@
 import React from 'react'
+import PlainCard from '../components/PlainCard'
 
 const Beranda = () => {
   return (
     <div>
+      <PlainCard />
       <p>
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Iste quis
         repellat asperiores fuga libero nulla provident? Sapiente repudiandae
