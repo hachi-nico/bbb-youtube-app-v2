@@ -1,4 +1,5 @@
 import React, {useState} from 'react'
+import {Link as RouterLink} from 'react-router-dom'
 
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
@@ -6,7 +7,6 @@ import CssBaseline from '@mui/material/CssBaseline'
 import Drawer from '@mui/material/Drawer'
 import Toolbar from '@mui/material/Toolbar'
 import Divider from '@mui/material/Divider'
-import Link from '@mui/material/Link'
 
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
@@ -26,7 +26,6 @@ import BottomNavigationAction from '@mui/material/BottomNavigationAction'
 
 import './MainLayout.css'
 import {indigo} from '../config/color'
-import {Link as RouterLink} from 'react-router-dom'
 
 const drawerWidth = 240
 
@@ -74,8 +73,8 @@ function MainLayout({children}) {
           navValue == item.label ? {bgcolor: indigo} : {bgcolor: '#fff'}
 
         return (
-          <Link to={item.route}>
-            <ListItem key={index} disablePadding>
+          <RouterLink to={item.route} key={index}>
+            <ListItem disablePadding>
               <ListItemButton
                 onClick={() => setNavValue(item.label)}
                 sx={{
@@ -90,13 +89,11 @@ function MainLayout({children}) {
                 <ListItemText sx={isActiveColor} primary={item.label} />
               </ListItemButton>
             </ListItem>
-          </Link>
+          </RouterLink>
         )
       })}
     </List>
   )
-
-  const mobileDrawerRouter = <Link to="/" />
 
   return (
     <Box sx={{display: 'flex'}} className="removeBoxPadding">
@@ -146,7 +143,7 @@ function MainLayout({children}) {
         sx={{
           px: 2,
           width: {md: `calc(100% - ${drawerWidth}px)`},
-          mt: {xs: 8, md: 2},
+          mt: {xs: 10, md: 2},
         }}
       >
         {children}
@@ -170,6 +167,8 @@ function MainLayout({children}) {
       >
         {adminMenuList.map((item, i) => (
           <BottomNavigationAction
+            LinkComponent={RouterLink}
+            to={item.route}
             key={i}
             label={item.label}
             value={item.label}
