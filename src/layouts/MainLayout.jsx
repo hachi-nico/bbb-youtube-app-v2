@@ -30,39 +30,45 @@ import {indigo} from '../config/color'
 const drawerWidth = 240
 
 function MainLayout({children}) {
-  const [navValue, setNavValue] = useState('Antrian')
-
-  const handleMobileNav = (event, newValue) => {
-    setNavValue(newValue)
-  }
-
   const adminMenuList = [
     {
       label: 'Antrian',
       icon: <LayersIcon />,
       route: '/',
+      title: 'Antrian Upload',
     },
     {
       label: 'Laporan',
       icon: <ArticleIcon />,
       route: '/laporan',
+      title: 'Laporan',
     },
     {
       label: 'Upload',
       icon: <BackupIcon />,
       route: '/upload',
+      title: 'Form Upload Manual',
     },
     {
       label: 'User',
       icon: <GroupIcon />,
       route: '/user',
+      title: 'Manajemen User',
     },
     {
       label: 'Keluar',
       icon: <LogoutIcon />,
       route: '/keluar',
+      title: 'keluar',
     },
   ]
+
+  const [navValue, setNavValue] = useState('Antrian')
+
+  const handleNav = (route, navTitle) => {
+    setNavValue(route)
+    document.title = navTitle
+  }
 
   const desktopDrawerItem = (
     <List sx={{mt: 2}}>
@@ -76,7 +82,7 @@ function MainLayout({children}) {
           <RouterLink to={item.route} key={index}>
             <ListItem disablePadding>
               <ListItemButton
-                onClick={() => setNavValue(item.label)}
+                onClick={() => handleNav(item.label, item.title)}
                 sx={{
                   ...isActiveBgColor,
                   '&:hover': {
@@ -96,7 +102,7 @@ function MainLayout({children}) {
   )
 
   return (
-    <Box sx={{display: 'flex', flex:1}} className="removeBoxPadding">
+    <Box sx={{display: 'flex', flex: 1}} className="removeBoxPadding">
       <CssBaseline />
       {/* Section Top Bar Mobile */}
       <AppBar position="fixed" sx={{display: {md: 'none'}, bgcolor: indigo}}>
@@ -142,7 +148,7 @@ function MainLayout({children}) {
       <Box
         sx={{
           px: 2,
-          width: {md: `calc(100% - ${drawerWidth}px)`},
+          width: {md: `calc(100% - ${drawerWidth}px)`, xs: '100%'},
           mt: {xs: 10, md: 2},
         }}
       >
@@ -163,7 +169,6 @@ function MainLayout({children}) {
           display: {md: 'none'},
         }}
         value={navValue}
-        onChange={handleMobileNav}
       >
         {adminMenuList.map((item, i) => (
           <BottomNavigationAction
@@ -174,6 +179,7 @@ function MainLayout({children}) {
             value={item.label}
             icon={item.icon}
             sx={{color: 'white'}}
+            onClick={() => handleNav(item.label, item.title)}
           />
         ))}
       </BottomNavigation>
