@@ -116,7 +116,7 @@ function MainLayout({children}) {
           sx={{
             display: {xs: 'none', md: 'block'},
             '& .MuiDrawer-paper': {boxSizing: 'border-box', width: drawerWidth},
-            '.MuiTouchRipple-child': {backgroundColor: 'blue'},
+            '&& .MuiTouchRipple-child': {backgroundColor: indigo},
           }}
           open
         >
