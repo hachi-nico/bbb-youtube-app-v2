@@ -1,10 +1,12 @@
 import React from 'react'
 
+import PlainCard from '../components/PlainCard'
+
 const UserPage = () => {
   return (
-    <div>
-      <p>Users</p>
-    </div>
+    <>
+      <PlainCard label="Manajemen User" />
+    </>
   )
 }
 

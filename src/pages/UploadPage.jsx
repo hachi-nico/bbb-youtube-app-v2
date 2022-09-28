@@ -1,10 +1,12 @@
 import React from 'react'
 
+import PlainCard from '../components/PlainCard'
+
 const UploadPage = () => {
   return (
-    <div>
-      <p>Upload</p>
-    </div>
+    <>
+      <PlainCard label="Form Upload Manual" />
+    </>
   )
 }
 
