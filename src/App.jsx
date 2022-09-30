@@ -1,5 +1,6 @@
 import React from 'react'
-import {BrowserRouter, Switch, Route} from 'react-router-dom'
+import {BrowserRouter, Switch, Route, Redirect} from 'react-router-dom'
+import {RecoilRoot, useRecoilValue} from 'recoil'
 
 import MainLayout from './layouts/MainLayout'
 import BerandaPage from './pages/BerandaPage'
@@ -8,11 +9,18 @@ import UploadPage from './pages/UploadPage'
 import UserPage from './pages/UserPage'
 import LoginPage from './pages/LoginPage'
 
+import {tokenAtom} from './store/authStore'
+
 export default function App() {
   return (
-    <BrowserRouter>
-      <MainPages />
-    </BrowserRouter>
+    <RecoilRoot>
+      <BrowserRouter>
+        <MainPages />
+        <Route exact path="/login">
+          <LoginPage />
+        </Route>
+      </BrowserRouter>
+    </RecoilRoot>
   )
 }
 
@@ -21,23 +29,42 @@ const MainPages = () => {
     <BrowserRouter>
       <MainLayout>
         <Switch>
-          <Route exact path="/">
+          <PrivateRoute exact path="/">
             <BerandaPage />
-          </Route>
-          <Route exact path="/laporan">
+          </PrivateRoute>
+          <PrivateRoute exact path="/laporan">
             <LaporanPage />
-          </Route>
-          <Route exact path="/upload">
+          </PrivateRoute>
+          <PrivateRoute exact path="/upload">
             <UploadPage />
-          </Route>
-          <Route exact path="/user">
+          </PrivateRoute>
+          <PrivateRoute exact path="/user">
             <UserPage />
-          </Route>
-          <Route exact path="/login">
-            <LoginPage />
-          </Route>
+          </PrivateRoute>
         </Switch>
       </MainLayout>
     </BrowserRouter>
+  )
+}
+
+const PrivateRoute = ({children, additionalProps}) => {
+  const token = useRecoilValue(tokenAtom)
+  return (
+    <Route
+      exact
+      {...additionalProps}
+      render={({location}) =>
+        token ? (
+          children
+        ) : (
+          <Redirect
+            to={{
+              pathname: '/login',
+              state: {from: location},
+            }}
+          />
+        )
+      }
+    />
   )
 }

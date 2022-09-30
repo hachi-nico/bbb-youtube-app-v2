@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
 import {Link as RouterLink} from 'react-router-dom'
+import {useRecoilValue} from 'recoil'
 
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
@@ -26,10 +27,15 @@ import BottomNavigationAction from '@mui/material/BottomNavigationAction'
 
 import './MainLayout.css'
 import {indigo} from '../config/color'
+import {tokenAtom} from '../store/authStore'
 
 const drawerWidth = 240
 
 function MainLayout({children}) {
+  const token = useRecoilValue(tokenAtom)
+
+  if (!token) return null
+
   const adminMenuList = [
     {
       label: 'Antrian',
