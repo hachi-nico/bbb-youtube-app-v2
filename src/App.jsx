@@ -14,57 +14,43 @@ import {tokenAtom} from './store/authStore'
 export default function App() {
   return (
     <RecoilRoot>
-      <BrowserRouter>
-        <MainPages />
-        <Route exact path="/login">
-          <LoginPage />
-        </Route>
-      </BrowserRouter>
+      <PageRouters />
     </RecoilRoot>
   )
 }
 
-const MainPages = () => {
+const PageRouters = () => {
   return (
     <BrowserRouter>
-      <MainLayout>
-        <Switch>
-          <PrivateRoute exact path="/">
+      <Switch>
+        <MainLayout>
+          <Route path="/login">
+            <LoginPage />
+          </Route>
+          <PrivateRoute path="/">
             <BerandaPage />
           </PrivateRoute>
-          <PrivateRoute exact path="/laporan">
+          <PrivateRoute path="/laporan">
             <LaporanPage />
           </PrivateRoute>
-          <PrivateRoute exact path="/upload">
+          <PrivateRoute path="/upload">
             <UploadPage />
           </PrivateRoute>
-          <PrivateRoute exact path="/user">
+          <PrivateRoute path="/user">
             <UserPage />
           </PrivateRoute>
-        </Switch>
-      </MainLayout>
+        </MainLayout>
+      </Switch>
     </BrowserRouter>
   )
 }
 
-const PrivateRoute = ({children, additionalProps}) => {
+const PrivateRoute = ({children, path}) => {
   const token = useRecoilValue(tokenAtom)
   return (
     <Route
-      exact
-      {...additionalProps}
-      render={({location}) =>
-        token ? (
-          children
-        ) : (
-          <Redirect
-            to={{
-              pathname: '/login',
-              state: {from: location},
-            }}
-          />
-        )
-      }
+      path={path}
+      render={() => (token ? children : <Redirect to={{pathname: '/login'}} />)}
     />
   )
 }

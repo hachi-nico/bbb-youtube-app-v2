@@ -34,7 +34,7 @@ const drawerWidth = 240
 function MainLayout({children}) {
   const token = useRecoilValue(tokenAtom)
 
-  if (!token) return null
+  if (!token) return children
 
   const adminMenuList = [
     {
