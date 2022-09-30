@@ -1,5 +1,5 @@
 import React from 'react'
-import {BrowserRouter, Switch, Route, Link} from 'react-router-dom'
+import {BrowserRouter, Switch, Route} from 'react-router-dom'
 
 import MainLayout from './layouts/MainLayout'
 import BerandaPage from './pages/BerandaPage'
@@ -12,7 +12,6 @@ export default function App() {
   return (
     <BrowserRouter>
       <MainPages />
-      {/* <LoginPage /> */}
     </BrowserRouter>
   )
 }
@@ -33,6 +32,9 @@ const MainPages = () => {
           </Route>
           <Route exact path="/user">
             <UserPage />
+          </Route>
+          <Route exact path="/login">
+            <LoginPage />
           </Route>
         </Switch>
       </MainLayout>
