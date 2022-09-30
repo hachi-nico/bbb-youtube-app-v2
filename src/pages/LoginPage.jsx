@@ -8,7 +8,7 @@ import CardContainer from '../components/CardContainer'
 function LoginPage() {
   useEffect(() => {
     document.body.style.backgroundColor = indigo
-
+    document.title = 'Login'
     return () => (document.body.style.backgroundColor = 'whitesmoke')
   }, [])
 

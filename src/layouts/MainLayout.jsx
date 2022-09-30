@@ -35,31 +35,26 @@ function MainLayout({children}) {
       label: 'Antrian',
       icon: <LayersIcon />,
       route: '/',
-      title: 'Antrian Upload',
     },
     {
       label: 'Laporan',
       icon: <ArticleIcon />,
       route: '/laporan',
-      title: 'Laporan',
     },
     {
       label: 'Upload',
       icon: <BackupIcon />,
       route: '/upload',
-      title: 'Form Upload Manual',
     },
     {
       label: 'User',
       icon: <GroupIcon />,
       route: '/user',
-      title: 'Manajemen User',
     },
     {
       label: 'Keluar',
       icon: <LogoutIcon />,
       route: '/keluar',
-      title: 'keluar',
     },
   ]
 
@@ -67,7 +62,6 @@ function MainLayout({children}) {
 
   const handleNav = (route, navTitle) => {
     setNavValue(route)
-    document.title = navTitle
   }
 
   const desktopDrawerItem = (
