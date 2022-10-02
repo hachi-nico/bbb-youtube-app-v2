@@ -40,7 +40,7 @@ function MainLayout({children}) {
     {
       label: 'Antrian',
       icon: <LayersIcon />,
-      route: '/',
+      route: '/antrian',
     },
     {
       label: 'Laporan',
@@ -66,7 +66,7 @@ function MainLayout({children}) {
 
   const [navValue, setNavValue] = useState('Antrian')
 
-  const handleNav = (route, navTitle) => {
+  const handleNav = route => {
     setNavValue(route)
   }
 
@@ -82,7 +82,7 @@ function MainLayout({children}) {
           <RouterLink to={item.route} key={index}>
             <ListItem disablePadding>
               <ListItemButton
-                onClick={() => handleNav(item.label, item.title)}
+                onClick={() => handleNav(item.label)}
                 sx={{
                   ...isActiveBgColor,
                   '&:hover': {
@@ -102,7 +102,7 @@ function MainLayout({children}) {
   )
 
   return (
-    <Box sx={{display: 'flex', flex: 1}} className="removeBoxPadding">
+    <Box sx={{display: 'flex', flex: 1}}>
       <CssBaseline />
       {/* Section Top Bar Mobile */}
       <AppBar position="fixed" sx={{display: {md: 'none'}, bgcolor: indigo}}>
@@ -180,7 +180,7 @@ function MainLayout({children}) {
             value={item.label}
             icon={item.icon}
             sx={{color: 'white'}}
-            onClick={() => handleNav(item.label, item.title)}
+            onClick={() => handleNav(item.label)}
           />
         ))}
       </BottomNavigation>

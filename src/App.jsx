@@ -24,10 +24,13 @@ const PageRouters = () => {
     <BrowserRouter>
       <Switch>
         <MainLayout>
-          <Route path="/login">
+          <Route exact path="/">
+            <Redirect to="/antrian" />
+          </Route>
+          <Route exact path="/login">
             <LoginPage />
           </Route>
-          <PrivateRoute path="/">
+          <PrivateRoute path="/antrian">
             <BerandaPage />
           </PrivateRoute>
           <PrivateRoute path="/laporan">

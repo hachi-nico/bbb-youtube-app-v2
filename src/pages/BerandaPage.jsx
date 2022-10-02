@@ -3,6 +3,8 @@ import React, {useEffect} from 'react'
 import PlainCard from '../components/PlainCard'
 import CardContainer from '../components/CardContainer'
 import GlobalTable from '../components/GlobalTable'
+import FullScreenLoader from '../components/FullScreenLoader'
+import Button from '@mui/material/Button'
 
 const Beranda = () => {
   useEffect(() => {
@@ -10,12 +12,14 @@ const Beranda = () => {
   }, [])
 
   return (
-    <div>
+    <>
+      {/* <FullScreenLoader /> */}
+      <Button variant="contained">Contained</Button>
       <PlainCard label="Antrian Upload" />
       <div style={{marginTop: 22}}>
         <GlobalTable />
       </div>
-    </div>
+    </>
   )
 }
 
