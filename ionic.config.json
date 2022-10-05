@@ -1,0 +1,7 @@
+{
+  "name": "bbb-yt-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}

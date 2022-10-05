@@ -14,7 +14,6 @@ const Beranda = () => {
   return (
     <>
       {/* <FullScreenLoader /> */}
-      <Button variant="contained">Contained</Button>
       <PlainCard label="Antrian Upload" />
       <div style={{marginTop: 22}}>
         <GlobalTable />
