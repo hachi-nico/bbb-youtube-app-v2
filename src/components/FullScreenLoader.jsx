@@ -1,22 +1,22 @@
 import React from 'react'
-import LinearProgress from '@mui/material/LinearProgress'
-import Box from '@mui/material/Box'
+import CircularProgress from '@mui/material/CircularProgress'
+
+import {floatingStyle} from '../config/globalStyles'
 
 function FullScreenLoader() {
   return (
-    <Box
-      sx={{
-        position: 'absolute',
-        top: 0,
-        bottom: 0,
-        right: 0,
-        left: 0,
+    <div
+      style={{
+        ...floatingStyle,
         zIndex: 10,
-        backgroundColor: 'rgba(255,255,255,0.5)',
+        backgroundColor: 'rgba(255,255,255,0.6)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        display: 'flex',
       }}
     >
-      <LinearProgress sx={{height: 10}} />
-    </Box>
+      <CircularProgress thickness={5} size={60} />
+    </div>
   )
 }
 

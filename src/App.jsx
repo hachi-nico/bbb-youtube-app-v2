@@ -9,8 +9,6 @@ import UploadPage from './pages/UploadPage'
 import UserPage from './pages/UserPage'
 import LoginPage from './pages/LoginPage'
 
-import {tokenAtom} from './store/authStore'
-
 export default function App() {
   return (
     <RecoilRoot>
@@ -24,12 +22,12 @@ const PageRouters = () => {
     <BrowserRouter>
       <Switch>
         <MainLayout>
-          <Route exact path="/">
+          <PrivateRoute exact path="/">
             <Redirect to="/antrian" />
-          </Route>
-          <Route exact path="/login">
+          </PrivateRoute>
+          <PublicRoute exact path="/login">
             <LoginPage />
-          </Route>
+          </PublicRoute>
           <PrivateRoute path="/antrian">
             <BerandaPage />
           </PrivateRoute>
@@ -49,11 +47,23 @@ const PageRouters = () => {
 }
 
 const PrivateRoute = ({children, path}) => {
-  const token = useRecoilValue(tokenAtom)
+  const token = JSON.parse(localStorage.getItem('token'))
   return (
     <Route
       path={path}
       render={() => (token ? children : <Redirect to={{pathname: '/login'}} />)}
+    />
+  )
+}
+
+const PublicRoute = ({children, path}) => {
+  const token = JSON.parse(localStorage.getItem('token'))
+  return (
+    <Route
+      path={path}
+      render={() =>
+        !token ? children : <Redirect to={{pathname: '/antrian'}} />
+      }
     />
   )
 }

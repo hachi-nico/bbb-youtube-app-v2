@@ -27,12 +27,11 @@ import BottomNavigationAction from '@mui/material/BottomNavigationAction'
 
 import './MainLayout.css'
 import {indigo} from '../config/color'
-import {tokenAtom} from '../store/authStore'
 
 const drawerWidth = 240
 
 function MainLayout({children}) {
-  const token = useRecoilValue(tokenAtom)
+  const token = JSON.parse(localStorage.getItem('token'))
 
   if (!token) return children
 
