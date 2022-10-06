@@ -15,6 +15,7 @@ function LoginPage() {
   const [pageState, setPageState] = useState({
     loading: false,
     errLabel: '',
+    alertOpen: false,
   })
   const [form, setForm] = useState({
     usernameErr: false,
@@ -52,7 +53,7 @@ function LoginPage() {
         history.push('/antrian')
       } else {
         pageStateHandler(
-          {loading: false, errLabel: 'Gagal saat Login'},
+          {loading: false, errLabel: 'Gagal saat Login', alertOpen: true},
           'pageState'
         )
       }
@@ -62,6 +63,7 @@ function LoginPage() {
         {
           loading: false,
           errLabel: e.response.data.message ?? 'Gagal saat Login',
+          alertOpen: true,
         },
         'pageState'
       )
@@ -89,15 +91,16 @@ function LoginPage() {
     pageStateHandler({[key]: event.target.value}, 'form')
   }
 
-  const {errLabel, loading} = pageState
+  const {errLabel, alertOpen, loading} = pageState
 
   return (
     <>
       <GlobalAlert
         label={errLabel}
         type="warning"
-        onClose={() => pageStateHandler({errLabel: ''}, 'pageState')}
-        opened={!!errLabel}
+        onClose={() => pageStateHandler({alertOpen: false}, 'pageState')}
+        opened={alertOpen}
+        promptDialog
       />
       {loading && <FullScreenLoader />}
       <CardContainer
