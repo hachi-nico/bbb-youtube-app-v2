@@ -15,6 +15,7 @@ import ListItem from '@mui/material/ListItem'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
+import Button from '@mui/material/Button'
 
 import LayersIcon from '@mui/icons-material/Layers'
 import ArticleIcon from '@mui/icons-material/Article'
@@ -155,7 +156,16 @@ function MainLayout({children}) {
       <CssBaseline />
       {/* Section Top Bar Mobile */}
       <AppBar position="fixed" sx={{display: {md: 'none'}, bgcolor: indigo}}>
-        <Toolbar></Toolbar>
+        <Toolbar
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
+          }}
+        >
+          <p>{user}</p>
+          <AccountCircleIcon sx={{marginLeft: 1, fontSize: 30}} />
+        </Toolbar>
       </AppBar>
 
       <Box sx={{width: {md: drawerWidth}}}>
@@ -227,7 +237,13 @@ function MainLayout({children}) {
             value={item.label}
             icon={item.icon}
             sx={{color: 'white'}}
-            onClick={() => handleNav(item.label)}
+            onClick={() => {
+              if (item.route == '/keluar') {
+                setPromptOpen(true)
+              } else {
+                handleNav(item.label)
+              }
+            }}
           />
         ))}
       </BottomNavigation>
