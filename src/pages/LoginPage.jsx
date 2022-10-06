@@ -97,7 +97,6 @@ function LoginPage() {
     <>
       <GlobalAlert
         label={errLabel}
-        type="warning"
         onClose={() => pageStateHandler({alertOpen: false}, 'pageState')}
         opened={alertOpen}
         promptDialog

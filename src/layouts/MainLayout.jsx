@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import {Link as RouterLink} from 'react-router-dom'
-import {useRecoilValue} from 'recoil'
+import axios from 'axios'
+import {useHistory} from 'react-router-dom'
 
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
@@ -27,6 +28,8 @@ import BottomNavigationAction from '@mui/material/BottomNavigationAction'
 
 import './MainLayout.css'
 import {indigo} from '../config/color'
+import GlobalAlert from '../components/GlobalAlert'
+import {baseUrl} from '../config/api'
 
 const drawerWidth = 240
 
@@ -64,9 +67,30 @@ function MainLayout({children}) {
   ]
 
   const [navValue, setNavValue] = useState('Antrian')
+  const [alertOpen, setAlertOpen] = useState(false)
+  const [promptOpen, setPromptOpen] = useState(false)
+  const history = useHistory()
 
   const handleNav = route => {
     setNavValue(route)
+  }
+
+  const logoutHandler = async () => {
+    const token = JSON.parse(localStorage.getItem('token'))
+    try {
+      const {data} = await axios.post(baseUrl + 'logout', {
+        token,
+      })
+
+      if (data.status == 1) {
+        localStorage.removeItem('token')
+        history.push('/login')
+      } else {
+        setAlertOpen(true)
+      }
+    } catch (e) {
+      setAlertOpen(true)
+    }
   }
 
   const desktopDrawerItem = (
@@ -81,7 +105,13 @@ function MainLayout({children}) {
           <RouterLink to={item.route} key={index}>
             <ListItem disablePadding>
               <ListItemButton
-                onClick={() => handleNav(item.label)}
+                onClick={() => {
+                  if (item.route == '/keluar') {
+                    setPromptOpen(true)
+                  } else {
+                    handleNav(item.label)
+                  }
+                }}
                 sx={{
                   ...isActiveBgColor,
                   '&:hover': {
@@ -102,6 +132,25 @@ function MainLayout({children}) {
 
   return (
     <Box sx={{display: 'flex', flex: 1}}>
+      <GlobalAlert
+        label={'Apakah anda yakin untuk melakukan Log Out ?'}
+        onClose={() => {
+          setPromptOpen(false)
+          history.push('/antrian')
+        }}
+        onConfirm={() => {
+          setPromptOpen(false)
+          logoutHandler()
+        }}
+        opened={promptOpen}
+        confirmDialog
+      />
+      <GlobalAlert
+        label={'Gagal saat Log Out'}
+        onClose={() => setAlertOpen(false)}
+        opened={alertOpen}
+        promptDialog
+      />
       <CssBaseline />
       {/* Section Top Bar Mobile */}
       <AppBar position="fixed" sx={{display: {md: 'none'}, bgcolor: indigo}}>
