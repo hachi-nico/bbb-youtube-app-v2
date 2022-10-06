@@ -70,6 +70,7 @@ function MainLayout({children}) {
   const [alertOpen, setAlertOpen] = useState(false)
   const [promptOpen, setPromptOpen] = useState(false)
   const history = useHistory()
+  const {user = 'user'} = JSON.parse(localStorage.getItem('userData'))
 
   const handleNav = route => {
     setNavValue(route)
@@ -176,7 +177,6 @@ function MainLayout({children}) {
           <Divider />
           {desktopDrawerItem}
           <div className="userInfoContainer">
-            <Divider />
             <div
               style={{
                 display: 'flex',
@@ -189,7 +189,7 @@ function MainLayout({children}) {
               }}
             >
               <AccountCircleIcon sx={{marginRight: 2, fontSize: 30}} />
-              <p>Nico Akbar Wahyudin Prasetyo Widodo</p>
+              <p>{user}</p>
             </div>
           </div>
         </Drawer>

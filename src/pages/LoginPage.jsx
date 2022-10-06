@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import axios from 'axios'
 import {useHistory} from 'react-router-dom'
+import {decodeToken} from 'react-jwt'
 
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
@@ -49,7 +50,10 @@ function LoginPage() {
       })
 
       if (data.status == 1) {
+        pageStateHandler({loading: false}, 'pageState')
+        const userData = decodeToken(data.token)
         localStorage.setItem('token', JSON.stringify(data.token))
+        localStorage.setItem('userData', JSON.stringify(userData))
         history.push('/antrian')
       } else {
         pageStateHandler(
