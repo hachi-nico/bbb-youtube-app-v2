@@ -158,10 +158,9 @@ function MainLayout({children}) {
       {/* Section Bottom Nav Mobile */}
       <BottomNavigation
         sx={{
-          position: 'absolute',
+          width: '100%',
+          position: 'fixed',
           bottom: 0,
-          right: 0,
-          left: 0,
           bgcolor: indigo,
           '& .Mui-selected, .Mui-selected > svg': {
             color: '#fff',

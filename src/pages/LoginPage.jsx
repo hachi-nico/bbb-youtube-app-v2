@@ -14,7 +14,6 @@ import GlobalAlert from '../components/GlobalAlert'
 function LoginPage() {
   const [pageState, setPageState] = useState({
     loading: false,
-    successLabel: '',
     errLabel: '',
   })
   const [form, setForm] = useState({
@@ -33,7 +32,7 @@ function LoginPage() {
   }, [])
 
   const loginHandler = async (username, password) => {
-    pageStateHandler({errLabel: '', successLabel: ''}, 'pageState')
+    pageStateHandler({errLabel: ''}, 'pageState')
     if (!username) {
       return pageStateHandler({usernameErr: true}, 'form')
     }
@@ -49,10 +48,6 @@ function LoginPage() {
       })
 
       if (data.status == 1) {
-        pageStateHandler(
-          {loading: false, errLabel: '', successLabel: 'data.message'},
-          'pageState'
-        )
         localStorage.setItem('token', JSON.stringify(data.token))
         history.push('/antrian')
       } else {
@@ -94,7 +89,7 @@ function LoginPage() {
     pageStateHandler({[key]: event.target.value}, 'form')
   }
 
-  const {errLabel, successLabel, loading} = pageState
+  const {errLabel, loading} = pageState
 
   return (
     <>
@@ -103,12 +98,6 @@ function LoginPage() {
         type="warning"
         onClose={() => pageStateHandler({errLabel: ''}, 'pageState')}
         opened={!!errLabel}
-      />
-      <GlobalAlert
-        label={successLabel}
-        type="success"
-        opened={!!successLabel}
-        onClose={() => pageStateHandler({successLabel: ''}, 'pageState')}
       />
       {loading && <FullScreenLoader />}
       <CardContainer
@@ -136,6 +125,7 @@ function LoginPage() {
             label="Password"
             variant="standard"
             onChange={val => formInputHandler('passwordVal', val)}
+            type="password"
           />
           <Button
             sx={s.textField}
