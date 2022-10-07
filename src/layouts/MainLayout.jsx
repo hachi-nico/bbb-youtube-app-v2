@@ -209,6 +209,7 @@ function MainLayout({children}) {
           px: 2,
           width: {md: `calc(100% - ${drawerWidth}px)`, xs: '100%'},
           mt: {xs: 10, md: 2},
+          mb: {xs: 10, md: 6},
         }}
       >
         {children}
