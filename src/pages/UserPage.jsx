@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import axios from 'axios'
+import {useHistory} from 'react-router-dom'
 
 import Button from '@mui/material/Button'
 import TableRow from '@mui/material/TableRow'
@@ -9,9 +10,9 @@ import GlobalTable from '../components/GlobalTable'
 import PlainCard from '../components/PlainCard'
 import GlobalAlert from '../components/GlobalAlert'
 import FullScreenLoader from '../components/FullScreenLoader'
-import {getLocalToken} from '../utils/globalFunction'
+import FetchMoreButton from '../components/FetchMoreButton'
+import {getLocalToken, isSessionExp} from '../utils/globalFunction'
 import {baseUrl} from '../config/api'
-import {indigo} from '../config/color'
 
 const UserPage = () => {
   const [userList, setUserList] = useState([])
@@ -19,10 +20,13 @@ const UserPage = () => {
     loading: false,
     err: false,
     errMsg: '',
-    limit: 15,
     offset: 0,
+    moreData: false,
+    noMoreDataLabel: false,
   })
-  const {errMsg, err, limit, offset, loading} = pageState
+  const history = useHistory()
+  const {errMsg, err, loading, offset, moreData, noMoreDataLabel} = pageState
+
   useEffect(() => {
     document.title = 'Manajemen User'
     setMultiState(setPageState, {loading: true})
@@ -41,11 +45,11 @@ const UserPage = () => {
     }))
   }
 
-  const fetchUser = async (isFetchmore = false) => {
+  const fetchUser = async () => {
     try {
       const {data} = await axios.post(
         baseUrl + 'user-list',
-        {limit, offset},
+        {limit: 15, offset},
         {
           headers: {
             authorization: getLocalToken(),
@@ -54,29 +58,31 @@ const UserPage = () => {
       )
       if (data.status == 1) {
         const {users} = data
-        setMultiState(setPageState, {loading: false})
-        !isFetchmore ? setUserList(users) : setUserList(s =>  [...s, ...users])
+        setMultiState(setPageState, {
+          loading: false,
+          offset: userList.length + users.length,
+        })
+        if (users.length <= 0)
+          setMultiState(setPageState, {noMoreDataLabel: true})
+        setUserList([...userList, ...users])
       } else {
+        isSessionExp(data.status, history)
         setMultiState(setPageState, {
           loading: false,
           err: true,
-          errMsg: 'Gagal saat mengambil data list User',
+          errMsg: data.message ?? 'Gagal saat mengambil data list User',
         })
       }
     } catch (e) {
+      isSessionExp(e.response.data.status, history)
       setMultiState(setPageState, {
         loading: false,
         err: true,
-        errMsg: '[CEA] - Gagal saat mengambil data list User',
+        errMsg: `[CEA] ${
+          e.response.data.message ?? 'Gagal saat mengambil data list User'
+        } `,
       })
     }
-  }
-
-  const fetchMore = async dataLength => {
-    setMultiState(setPageState, {
-      offset: dataLength,
-    })
-    await fetchUser(true)
   }
 
   return (
@@ -99,7 +105,7 @@ const UserPage = () => {
                   key={i}
                   sx={{'&:last-child td, &:last-child th': {border: 0}}}
                 >
-                  <TableCell>{item.user_id}</TableCell>
+                  <TableCell>{i}</TableCell>
                   <TableCell>{item.nama}</TableCell>
                   <TableCell>{item.username}</TableCell>
                   <TableCell>{item.tipe}</TableCell>
@@ -109,13 +115,16 @@ const UserPage = () => {
             <div
               style={{display: 'flex', flexDirection: 'column', marginTop: 20}}
             >
-              <Button
-                sx={{p: 1, backgroundColor: indigo}}
-                variant="contained"
-                onClick={() => fetchMore(userList.length)}
-              >
-                Muat lagi
-              </Button>
+              <FetchMoreButton
+                label="Muat Lebih Banyak"
+                onClick={async () => {
+                  setMultiState(setPageState, {moreData: true})
+                  await fetchUser()
+                  setMultiState(setPageState, {moreData: false})
+                }}
+                moreData={moreData}
+                noMoreDataLabel={noMoreDataLabel}
+              />
             </div>
           </>
         ) : null}
