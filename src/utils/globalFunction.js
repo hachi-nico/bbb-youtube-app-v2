@@ -14,3 +14,10 @@ export const isSessionExp = (status, history) => {
     return false
   }
 }
+
+export const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  })
+}

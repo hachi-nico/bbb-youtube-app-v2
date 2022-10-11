@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react'
 import axios from 'axios'
 import {useHistory} from 'react-router-dom'
 
-import Button from '@mui/material/Button'
 import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
 
@@ -11,7 +10,8 @@ import PlainCard from '../components/PlainCard'
 import GlobalAlert from '../components/GlobalAlert'
 import FullScreenLoader from '../components/FullScreenLoader'
 import FetchMoreButton from '../components/FetchMoreButton'
-import {getLocalToken, isSessionExp} from '../utils/globalFunction'
+import MainFloatingButton from '../components/MainFloatingButton'
+import {getLocalToken, isSessionExp, scrollToTop} from '../utils/globalFunction'
 import {baseUrl} from '../config/api'
 
 const UserPage = () => {
@@ -45,11 +45,11 @@ const UserPage = () => {
     }))
   }
 
-  const fetchUser = async () => {
+  const fetchUser = async (isRefresh = false) => {
     try {
       const {data} = await axios.post(
         baseUrl + 'user-list',
-        {limit: 15, offset},
+        {limit: 15, offset: isRefresh ? 0 : offset},
         {
           headers: {
             authorization: getLocalToken(),
@@ -60,11 +60,13 @@ const UserPage = () => {
         const {users} = data
         setMultiState(setPageState, {
           loading: false,
-          offset: userList.length + users.length,
+          offset: isRefresh ? 0 : userList.length + users.length,
         })
-        if (users.length <= 0)
+
+        if (users.length <= 0 && !isRefresh)
           setMultiState(setPageState, {noMoreDataLabel: true})
-        setUserList([...userList, ...users])
+
+        isRefresh ? setUserList(users) : setUserList([...userList, ...users])
       } else {
         isSessionExp(data.status, history)
         setMultiState(setPageState, {
@@ -87,6 +89,21 @@ const UserPage = () => {
 
   return (
     <>
+      <MainFloatingButton
+        scrollToTop={scrollToTop}
+        refreshPage={async () => {
+          setMultiState(setPageState, {
+            loading: true,
+            err: false,
+            errMsg: '',
+            offset: 0,
+            moreData: false,
+            noMoreDataLabel: false,
+          })
+          setUserList([])
+          await fetchUser(true)
+        }}
+      />
       {loading && <FullScreenLoader />}
       {/* Error Alert */}
       <GlobalAlert
@@ -96,7 +113,7 @@ const UserPage = () => {
         promptDialog
       />
       <PlainCard label="Manajemen User" />
-      <div style={{marginTop: 26}}>
+      <div style={{marginTop: 26, marginBottom: 20}}>
         {!err && !loading && userList.length > 0 ? (
           <>
             <GlobalTable headingList={['No.', 'Nama', 'Username', 'Tipe']}>
@@ -105,7 +122,7 @@ const UserPage = () => {
                   key={i}
                   sx={{'&:last-child td, &:last-child th': {border: 0}}}
                 >
-                  <TableCell>{i}</TableCell>
+                  <TableCell>{i + 1}</TableCell>
                   <TableCell>{item.nama}</TableCell>
                   <TableCell>{item.username}</TableCell>
                   <TableCell>{item.tipe}</TableCell>
