@@ -11,14 +11,14 @@ function MainFloatingButton({refreshPage, scrollToTop}) {
     <div style={{position: 'fixed', bottom: 14, right: 14, zIndex: 100}}>
       <Button
         variant="contained"
-        style={{padding: 10, marginRight: 10, backgroundColor: indigo}}
+        sx={{padding: 1.4, marginRight: 2, backgroundColor: indigo}}
         onClick={refreshPage}
       >
         <RefreshIcon />
       </Button>
       <Button
         variant="contained"
-        style={{padding: 10, backgroundColor: green}}
+        sx={{padding: 1.4, backgroundColor: green}}
         onClick={scrollToTop}
       >
         <KeyboardDoubleArrowUpIcon />

@@ -4,6 +4,8 @@ import {useHistory} from 'react-router-dom'
 
 import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
 
 import GlobalTable from '../components/GlobalTable'
 import PlainCard from '../components/PlainCard'
@@ -11,8 +13,10 @@ import GlobalAlert from '../components/GlobalAlert'
 import FullScreenLoader from '../components/FullScreenLoader'
 import FetchMoreButton from '../components/FetchMoreButton'
 import MainFloatingButton from '../components/MainFloatingButton'
+import ModalCreateUser from '../components/ModalCreateUser'
 import {getLocalToken, isSessionExp, scrollToTop} from '../utils/globalFunction'
 import {baseUrl} from '../config/api'
+import {green} from '../config/color'
 
 const UserPage = () => {
   const [userList, setUserList] = useState([])
@@ -23,9 +27,38 @@ const UserPage = () => {
     offset: 0,
     moreData: false,
     noMoreDataLabel: false,
+    modifyUserModalVisible: false,
+  })
+  const [form, setForm] = useState({
+    username: '',
+    usernameErr: false,
+    nama: '',
+    role: '',
+    password: '',
+    passwordErr: false,
+    passwordRepeat: '',
+    passwordRepeatErr: false,
   })
   const history = useHistory()
-  const {errMsg, err, loading, offset, moreData, noMoreDataLabel} = pageState
+  const {
+    errMsg,
+    err,
+    loading,
+    offset,
+    moreData,
+    noMoreDataLabel,
+    modifyUserModalVisible,
+  } = pageState
+  const {
+    username,
+    usernameErr,
+    nama,
+    role,
+    password,
+    passwordErr,
+    passwordRepeat,
+    passwordRepeatErr,
+  } = form
 
   useEffect(() => {
     document.title = 'Manajemen User'
@@ -87,8 +120,73 @@ const UserPage = () => {
     }
   }
 
+  const resetForm = () => {
+    setMultiState(setForm, {
+      username: '',
+      usernameErr: '',
+      nama: '',
+      role: '',
+      password: '',
+      passwordErr: '',
+      passwordRepeat: '',
+      passwordRepeatErr: '',
+    })
+  }
+
+  const formInputHandler = (key, event) => {
+    if (username) setMultiState(setPageState, {usernameErr: false})
+
+    setMultiState(setForm, {[key]: event.target.value})
+  }
+
   return (
     <>
+      {modifyUserModalVisible && (
+        <ModalCreateUser
+          open={modifyUserModalVisible}
+          closeHandler={() =>
+            setMultiState(setPageState, {modifyUserModalVisible: false})
+          }
+        >
+          <TextField
+            error={usernameErr}
+            value={username}
+            sx={s.textField}
+            label="Username"
+            variant="standard"
+            onChange={val => formInputHandler('username', val)}
+            fullWidth
+          />
+          <TextField
+            value={nama}
+            sx={s.textField}
+            label="Nama"
+            variant="standard"
+            onChange={val => formInputHandler('nama', val)}
+            fullWidth
+          />
+          <TextField
+            error={passwordErr}
+            value={password}
+            sx={s.textField}
+            label="Password"
+            variant="standard"
+            type="password"
+            onChange={val => formInputHandler('password', val)}
+            fullWidth
+          />
+          <TextField
+            error={passwordRepeatErr}
+            value={passwordRepeat}
+            sx={s.textField}
+            label="Ulangi Password"
+            variant="standard"
+            type="password"
+            onChange={val => formInputHandler('passwordRepeat', val)}
+            fullWidth
+          />
+        </ModalCreateUser>
+      )}
       <MainFloatingButton
         scrollToTop={scrollToTop}
         refreshPage={async () => {
@@ -114,6 +212,15 @@ const UserPage = () => {
       />
       <PlainCard label="Manajemen User" />
       <div style={{marginTop: 26, marginBottom: 20}}>
+        <Button
+          variant="contained"
+          sx={{backgroundColor: green, mb: 2}}
+          onClick={() =>
+            setMultiState(setPageState, {modifyUserModalVisible: true})
+          }
+        >
+          Tambah User
+        </Button>
         {!err && !loading && userList.length > 0 ? (
           <>
             <GlobalTable headingList={['No.', 'Nama', 'Username', 'Tipe']}>
@@ -148,6 +255,12 @@ const UserPage = () => {
       </div>
     </>
   )
+}
+
+const s = {
+  textField: {
+    my: 2,
+  },
 }
 
 export default UserPage
