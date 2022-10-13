@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import {Link as RouterLink} from 'react-router-dom'
 import axios from 'axios'
-import {useHistory} from 'react-router-dom'
+import {useHistory, useLocation} from 'react-router-dom'
 
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
@@ -15,7 +15,6 @@ import ListItem from '@mui/material/ListItem'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
-import Button from '@mui/material/Button'
 
 import LayersIcon from '@mui/icons-material/Layers'
 import ArticleIcon from '@mui/icons-material/Article'
@@ -36,7 +35,6 @@ const drawerWidth = 240
 
 function MainLayout({children}) {
   const token = JSON.parse(localStorage.getItem('token'))
-
   if (!token) return children
 
   const adminMenuList = [
@@ -71,6 +69,7 @@ function MainLayout({children}) {
   const [alertOpen, setAlertOpen] = useState(false)
   const [promptOpen, setPromptOpen] = useState(false)
   const history = useHistory()
+  const {pathname} = useLocation()
   const {user = 'user'} = JSON.parse(localStorage.getItem('userData'))
 
   const handleNav = route => {
@@ -99,9 +98,9 @@ function MainLayout({children}) {
     <List sx={{mt: 2}}>
       {adminMenuList.map((item, index) => {
         const isActiveColor =
-          navValue == item.label ? {color: '#fff'} : {color: '#000'}
+          pathname == item.route ? {color: '#fff'} : {color: '#000'}
         const isActiveBgColor =
-          navValue == item.label ? {bgcolor: indigo} : {bgcolor: '#fff'}
+          pathname == item.route ? {bgcolor: indigo} : {bgcolor: '#fff'}
 
         return (
           <RouterLink to={item.route} key={index}>
@@ -209,7 +208,7 @@ function MainLayout({children}) {
           px: 2,
           width: {md: `calc(100% - ${drawerWidth}px)`, xs: '100%'},
           mt: {xs: 10, md: 2},
-          mb: {xs: 10, md: 6},
+          mb: {xs: 16, md: 6},
         }}
       >
         {children}
