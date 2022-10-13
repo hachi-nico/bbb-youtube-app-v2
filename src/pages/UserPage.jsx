@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from 'react'
 import axios from 'axios'
 import {useHistory} from 'react-router-dom'
+import dayjs from 'dayjs'
+import 'dayjs/locale/id'
 
 import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
@@ -17,8 +19,10 @@ import ModalCreateUser from '../components/ModalCreateUser'
 import {getLocalToken, isSessionExp, scrollToTop} from '../utils/globalFunction'
 import {baseUrl} from '../config/api'
 import {green} from '../config/color'
+import {mainDateTimeFormat} from '../config/globalvar'
 
 const UserPage = () => {
+  dayjs.locale('id')
   const [userList, setUserList] = useState([])
   const [pageState, setPageState] = useState({
     loading: false,
@@ -223,7 +227,15 @@ const UserPage = () => {
         </Button>
         {!err && !loading && userList.length > 0 ? (
           <>
-            <GlobalTable headingList={['No.', 'Nama', 'Username', 'Tipe']}>
+            <GlobalTable
+              headingList={[
+                'No.',
+                'Nama',
+                'Username',
+                'Tipe',
+                'Tanggal Dibuat',
+              ]}
+            >
               {userList.map((item, i) => (
                 <TableRow
                   key={i}
@@ -233,6 +245,13 @@ const UserPage = () => {
                   <TableCell>{item.nama}</TableCell>
                   <TableCell>{item.username}</TableCell>
                   <TableCell>{item.tipe}</TableCell>
+                  <TableCell>
+                    {`${
+                      item.tgl
+                        ? dayjs(item.tgl).format(mainDateTimeFormat)
+                        : '-'
+                    }`}
+                  </TableCell>
                 </TableRow>
               ))}
             </GlobalTable>

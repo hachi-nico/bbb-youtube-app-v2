@@ -6,7 +6,6 @@ import {
   useLocation,
   useHistory,
 } from 'react-router-dom'
-import {RecoilRoot, useRecoilValue} from 'recoil'
 
 import MainLayout from './layouts/MainLayout'
 import BerandaPage from './pages/BerandaPage'
