@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import axios from 'axios'
 import {useHistory} from 'react-router-dom'
 import dayjs from 'dayjs'
@@ -15,7 +15,7 @@ import GlobalAlert from '../components/GlobalAlert'
 import FullScreenLoader from '../components/FullScreenLoader'
 import FetchMoreButton from '../components/FetchMoreButton'
 import MainFloatingButton from '../components/MainFloatingButton'
-import ModalCreateUser from '../components/ModalCreateUser'
+import ModalCreateUser from '../components/UserPage/ModalCreateUser'
 import {getLocalToken, isSessionExp, scrollToTop} from '../utils/globalFunction'
 import {baseUrl} from '../config/api'
 import {green} from '../config/color'
@@ -32,6 +32,7 @@ const UserPage = () => {
     moreData: false,
     noMoreDataLabel: false,
     modifyUserModalVisible: false,
+    tglSort: false,
   })
   const [form, setForm] = useState({
     username: '',
@@ -52,6 +53,7 @@ const UserPage = () => {
     moreData,
     noMoreDataLabel,
     modifyUserModalVisible,
+    tglSort,
   } = pageState
   const {
     username,
@@ -63,17 +65,30 @@ const UserPage = () => {
     passwordRepeat,
     passwordRepeatErr,
   } = form
+  const isFirstRender = useRef(true)
 
   useEffect(() => {
-    document.title = 'Manajemen User'
-    setMultiState(setPageState, {loading: true})
     const controller = new AbortController()
-    const init = async () => {
-      await fetchUser()
+    if (isFirstRender.current) {
+      isFirstRender.current = false // toggle flag after first render/mounting
+
+      document.title = 'Manajemen User'
+      setMultiState(setPageState, {loading: true})
+      const init = async () => {
+        await fetchUser()
+      }
+      init()
     }
-    init()
+
+    const listenSorting = async () => {
+      resetPageState()
+      setUserList([])
+      await fetchUser(true, {tglSort: tglSort ? 'ASC' : 'DESC'})
+    }
+    listenSorting()
+
     return () => controller.abort()
-  }, [])
+  }, [tglSort])
 
   const setMultiState = (setStateName, obj) => {
     setStateName(s => ({
@@ -82,11 +97,15 @@ const UserPage = () => {
     }))
   }
 
-  const fetchUser = async (isRefresh = false) => {
+  const fetchUser = async (isRefresh = false, additionalParams = {}) => {
     try {
       const {data} = await axios.post(
         baseUrl + 'user-list',
-        {limit: 15, offset: isRefresh ? 0 : offset},
+        {
+          limit: 15,
+          offset: isRefresh ? 0 : offset,
+          ...additionalParams,
+        },
         {
           headers: {
             authorization: getLocalToken(),
@@ -137,6 +156,17 @@ const UserPage = () => {
     })
   }
 
+  const resetPageState = () => {
+    setMultiState(setPageState, {
+      loading: true,
+      err: false,
+      errMsg: '',
+      offset: 0,
+      moreData: false,
+      noMoreDataLabel: false,
+    })
+  }
+
   const formInputHandler = (key, event) => {
     if (username) setMultiState(setPageState, {usernameErr: false})
 
@@ -145,6 +175,90 @@ const UserPage = () => {
 
   return (
     <>
+      <MainFloatingButton
+        scrollToTop={scrollToTop}
+        refreshPage={async () => {
+          resetPageState()
+          setUserList([])
+          await fetchUser(true)
+        }}
+      />
+      {loading && <FullScreenLoader />}
+
+      {/* Error Alert */}
+      <GlobalAlert
+        label={errMsg}
+        onClose={() => setMultiState(setPageState, {err: false})}
+        opened={err}
+        promptDialog
+      />
+
+      <PlainCard label="Manajemen User" />
+      <div style={{marginTop: 26, marginBottom: 20}}>
+        <Button
+          variant="contained"
+          sx={{backgroundColor: green, mb: 2}}
+          onClick={() =>
+            setMultiState(setPageState, {modifyUserModalVisible: true})
+          }
+        >
+          Tambah User
+        </Button>
+        {!err && !loading && userList.length > 0 ? (
+          <>
+            <GlobalTable
+              headingList={[
+                {label: 'No.'},
+                {label: 'Nama'},
+                {label: 'Username'},
+                {label: 'Tipe'},
+                {
+                  label: 'Tanggal Dibuat',
+                  sort: true,
+                  sortType: tglSort,
+                  handler: () =>
+                    setPageState(s => ({...s, tglSort: !s.tglSort})),
+                },
+              ]}
+            >
+              {userList.map((item, i) => (
+                <TableRow
+                  key={i}
+                  sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                >
+                  <TableCell>{i + 1}</TableCell>
+                  <TableCell>{item.nama}</TableCell>
+                  <TableCell>{item.username}</TableCell>
+                  <TableCell>{item.tipe}</TableCell>
+                  <TableCell>
+                    {`${
+                      item.tgl
+                        ? dayjs(item.tgl).format(mainDateTimeFormat)
+                        : '-'
+                    }`}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </GlobalTable>
+            <div
+              style={{display: 'flex', flexDirection: 'column', marginTop: 20}}
+            >
+              <FetchMoreButton
+                label="Muat Lebih Banyak"
+                onClick={async () => {
+                  setMultiState(setPageState, {moreData: true})
+                  await fetchUser()
+                  setMultiState(setPageState, {moreData: false})
+                }}
+                moreData={moreData}
+                noMoreDataLabel={noMoreDataLabel}
+              />
+            </div>
+          </>
+        ) : null}
+      </div>
+
+      {/* Section tambah edit user */}
       {modifyUserModalVisible && (
         <ModalCreateUser
           open={modifyUserModalVisible}
@@ -191,87 +305,6 @@ const UserPage = () => {
           />
         </ModalCreateUser>
       )}
-      <MainFloatingButton
-        scrollToTop={scrollToTop}
-        refreshPage={async () => {
-          setMultiState(setPageState, {
-            loading: true,
-            err: false,
-            errMsg: '',
-            offset: 0,
-            moreData: false,
-            noMoreDataLabel: false,
-          })
-          setUserList([])
-          await fetchUser(true)
-        }}
-      />
-      {loading && <FullScreenLoader />}
-      {/* Error Alert */}
-      <GlobalAlert
-        label={errMsg}
-        onClose={() => setMultiState(setPageState, {err: false})}
-        opened={err}
-        promptDialog
-      />
-      <PlainCard label="Manajemen User" />
-      <div style={{marginTop: 26, marginBottom: 20}}>
-        <Button
-          variant="contained"
-          sx={{backgroundColor: green, mb: 2}}
-          onClick={() =>
-            setMultiState(setPageState, {modifyUserModalVisible: true})
-          }
-        >
-          Tambah User
-        </Button>
-        {!err && !loading && userList.length > 0 ? (
-          <>
-            <GlobalTable
-              headingList={[
-                'No.',
-                'Nama',
-                'Username',
-                'Tipe',
-                'Tanggal Dibuat',
-              ]}
-            >
-              {userList.map((item, i) => (
-                <TableRow
-                  key={i}
-                  sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                >
-                  <TableCell>{i + 1}</TableCell>
-                  <TableCell>{item.nama}</TableCell>
-                  <TableCell>{item.username}</TableCell>
-                  <TableCell>{item.tipe}</TableCell>
-                  <TableCell>
-                    {`${
-                      item.tgl
-                        ? dayjs(item.tgl).format(mainDateTimeFormat)
-                        : '-'
-                    }`}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </GlobalTable>
-            <div
-              style={{display: 'flex', flexDirection: 'column', marginTop: 20}}
-            >
-              <FetchMoreButton
-                label="Muat Lebih Banyak"
-                onClick={async () => {
-                  setMultiState(setPageState, {moreData: true})
-                  await fetchUser()
-                  setMultiState(setPageState, {moreData: false})
-                }}
-                moreData={moreData}
-                noMoreDataLabel={noMoreDataLabel}
-              />
-            </div>
-          </>
-        ) : null}
-      </div>
     </>
   )
 }

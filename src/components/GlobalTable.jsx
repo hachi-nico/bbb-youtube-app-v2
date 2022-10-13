@@ -5,6 +5,7 @@ import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
+import TableSortLabel from '@mui/material/TableSortLabel'
 import Paper from '@mui/material/Paper'
 
 const GlobalTable = ({headingList = [], children}) => {
@@ -13,11 +14,23 @@ const GlobalTable = ({headingList = [], children}) => {
       <Table sx={{minWidth: 650}} aria-label="simple table">
         <TableHead>
           <TableRow>
-            {headingList.map((item, i) => (
-              <TableCell key={i} sx={s.tableHeading}>
-                {item}
-              </TableCell>
-            ))}
+            {headingList.map((item, i) => {
+              return item.sort ? (
+                <TableCell key={i} sx={s.tableHeading}>
+                  <TableSortLabel
+                    active={true}
+                    direction={item.sortType ? 'asc' : 'desc'}
+                    onClick={item.handler}
+                  >
+                    {item.label}
+                  </TableSortLabel>
+                </TableCell>
+              ) : (
+                <TableCell key={i} sx={s.tableHeading}>
+                  {item.label}
+                </TableCell>
+              )
+            })}
           </TableRow>
         </TableHead>
         <TableBody>{children}</TableBody>
