@@ -179,6 +179,7 @@ const UserPage = () => {
         scrollToTop={scrollToTop}
         refreshPage={async () => {
           resetPageState()
+          setMultiState(setPageState, {tglSort: false})
           setUserList([])
           await fetchUser(true)
         }}
