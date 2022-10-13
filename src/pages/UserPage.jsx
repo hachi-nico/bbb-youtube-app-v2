@@ -38,7 +38,7 @@ const UserPage = () => {
     username: '',
     usernameErr: false,
     nama: '',
-    role: '',
+    role: 2,
     password: '',
     passwordErr: false,
     passwordRepeat: '',
@@ -70,7 +70,7 @@ const UserPage = () => {
   useEffect(() => {
     const controller = new AbortController()
     if (isFirstRender.current) {
-      isFirstRender.current = false // toggle flag after first render/mounting
+      isFirstRender.current = false
 
       document.title = 'Manajemen User'
       setMultiState(setPageState, {loading: true})
@@ -169,8 +169,11 @@ const UserPage = () => {
 
   const formInputHandler = (key, event) => {
     if (username) setMultiState(setPageState, {usernameErr: false})
-
     setMultiState(setForm, {[key]: event.target.value})
+  }
+
+  const getRoleName = role => {
+    return role == 1 ? 'Super user' : role == 2 ? 'Dosen' : 'Mahasiswa'
   }
 
   return (
@@ -212,7 +215,7 @@ const UserPage = () => {
                 {label: 'No.'},
                 {label: 'Nama'},
                 {label: 'Username'},
-                {label: 'Tipe'},
+                {label: 'Role'},
                 {
                   label: 'Tanggal Dibuat',
                   sort: true,
@@ -230,7 +233,7 @@ const UserPage = () => {
                   <TableCell>{i + 1}</TableCell>
                   <TableCell>{item.nama}</TableCell>
                   <TableCell>{item.username}</TableCell>
-                  <TableCell>{item.tipe}</TableCell>
+                  <TableCell>{getRoleName(item.tipe)}</TableCell>
                   <TableCell>
                     {`${
                       item.tgl
