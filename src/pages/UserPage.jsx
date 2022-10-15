@@ -33,6 +33,9 @@ const UserPage = () => {
     noMoreDataLabel: false,
     modifyUserModalVisible: false,
     tglSort: false,
+    namaSearch: '',
+    usernameParams: '',
+    tipeSelect: '',
   })
   const [form, setForm] = useState({
     username: '',
@@ -54,6 +57,10 @@ const UserPage = () => {
     noMoreDataLabel,
     modifyUserModalVisible,
     tglSort,
+    namaSearch,
+    tipeSelect,
+    usernameParams,
+    refreshTrigger,
   } = pageState
   const {
     username,
@@ -78,17 +85,20 @@ const UserPage = () => {
         await fetchUser()
       }
       init()
+    } else {
+      const listenSorting = async () => {
+        resetPageState()
+        setUserList([])
+        await fetchUser(true, {
+          tglSort: tglSort ? 'ASC' : 'DESC',
+          usernameParams,
+        })
+      }
+      listenSorting()
     }
-
-    const listenSorting = async () => {
-      resetPageState()
-      setUserList([])
-      await fetchUser(true, {tglSort: tglSort ? 'ASC' : 'DESC'})
-    }
-    listenSorting()
 
     return () => controller.abort()
-  }, [tglSort])
+  }, [tglSort, usernameParams, refreshTrigger])
 
   const setMultiState = (setStateName, obj) => {
     setStateName(s => ({
@@ -172,6 +182,12 @@ const UserPage = () => {
     setMultiState(setForm, {[key]: event.target.value})
   }
 
+  const formInputKeypressHandler = async (key, event) => {
+    if (event.keyCode == 13) {
+      setMultiState(setPageState, {[key]: event.target.value})
+    }
+  }
+
   const getRoleName = role => {
     return role == 1 ? 'Super user' : role == 2 ? 'Dosen' : 'Mahasiswa'
   }
@@ -182,7 +198,12 @@ const UserPage = () => {
         scrollToTop={scrollToTop}
         refreshPage={async () => {
           resetPageState()
-          setMultiState(setPageState, {tglSort: false})
+          setMultiState(setPageState, {
+            tglSort: false,
+            namaSearch: '',
+            usernameParams: '',
+            tipeSelect: '',
+          })
           setUserList([])
           await fetchUser(true)
         }}
@@ -208,12 +229,12 @@ const UserPage = () => {
         >
           Tambah User
         </Button>
-        {!err && !loading && userList.length > 0 ? (
+        {!err && !loading ? (
           <>
             <GlobalTable
               headingList={[
                 {label: 'No.'},
-                {label: 'Nama'},
+                {label: 'Nama', search: true},
                 {label: 'Username'},
                 {label: 'Role'},
                 {
@@ -225,6 +246,22 @@ const UserPage = () => {
                 },
               ]}
             >
+              {/* Section filtering */}
+              <TableRow sx={{'&:last-child td, &:last-child th': {border: 0}}}>
+                <TableCell></TableCell>
+                <TableCell></TableCell>
+                <TableCell>
+                  <TextField
+                    label="Username"
+                    variant="outlined"
+                    onKeyDown={val =>
+                      formInputKeypressHandler('usernameParams', val)
+                    }
+                  />
+                </TableCell>
+                <TableCell></TableCell>
+                <TableCell></TableCell>
+              </TableRow>
               {userList.map((item, i) => (
                 <TableRow
                   key={i}
@@ -244,22 +281,26 @@ const UserPage = () => {
                 </TableRow>
               ))}
             </GlobalTable>
-            <div
-              style={{display: 'flex', flexDirection: 'column', marginTop: 20}}
-            >
-              <FetchMoreButton
-                label="Muat Lebih Banyak"
-                onClick={async () => {
-                  setMultiState(setPageState, {moreData: true})
-                  await fetchUser()
-                  setMultiState(setPageState, {moreData: false})
-                }}
-                moreData={moreData}
-                noMoreDataLabel={noMoreDataLabel}
-              />
-            </div>
           </>
         ) : null}
+
+        {userList.length > 0 && (
+          <div
+            style={{display: 'flex', flexDirection: 'column', marginTop: 20}}
+          >
+            <FetchMoreButton
+              label="Muat Lebih Banyak"
+              onClick={async () => {
+                setMultiState(setPageState, {moreData: true})
+                setUserList([])
+                await fetchUser(false, {tglSort: tglSort ? 'ASC' : 'DESC'})
+                setMultiState(setPageState, {moreData: false})
+              }}
+              moreData={moreData}
+              noMoreDataLabel={noMoreDataLabel}
+            />
+          </div>
+        )}
       </div>
 
       {/* Section tambah edit user */}

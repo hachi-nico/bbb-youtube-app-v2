@@ -14,9 +14,9 @@ const GlobalTable = ({headingList = [], children}) => {
       <Table sx={{minWidth: 650}} aria-label="simple table">
         <TableHead>
           <TableRow>
-            {headingList.map((item, i) => {
-              return item.sort ? (
-                <TableCell key={i} sx={s.tableHeading}>
+            {headingList.map((item, i) => (
+              <TableCell key={i} sx={s.tableHeading}>
+                {item.sort ? (
                   <TableSortLabel
                     active={true}
                     direction={item.sortType ? 'asc' : 'desc'}
@@ -24,13 +24,11 @@ const GlobalTable = ({headingList = [], children}) => {
                   >
                     {item.label}
                   </TableSortLabel>
-                </TableCell>
-              ) : (
-                <TableCell key={i} sx={s.tableHeading}>
-                  {item.label}
-                </TableCell>
-              )
-            })}
+                ) : (
+                  <>{item.label}</>
+                )}
+              </TableCell>
+            ))}
           </TableRow>
         </TableHead>
         <TableBody>{children}</TableBody>
