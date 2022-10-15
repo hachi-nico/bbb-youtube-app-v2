@@ -1,6 +1,6 @@
 import {atom} from 'recoil'
 
-export const navLabelAtom = atom({
+export const navLabel = atom({
   key: 'navLabel',
-  default: 'Antrian',
+  default: '',
 })
