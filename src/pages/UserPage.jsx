@@ -12,7 +12,7 @@ import TextField from '@mui/material/TextField'
 
 import GlobalTable from '../components/GlobalTable'
 import PlainCard from '../components/PlainCard'
-import GlobalAlert from '../components/GlobalAlert'
+import FullPageWarning from '../components/FullPageWarning'
 import FullScreenLoader from '../components/FullScreenLoader'
 import FetchMoreButton from '../components/FetchMoreButton'
 import MainFloatingButton from '../components/MainFloatingButton'
@@ -97,8 +97,6 @@ const UserPage = () => {
             search,
           },
         })
-        console.log(nextData, 'next')
-        console.log(prevData, 'prev')
         if (nextData.users.length <= 0)
           setMultiState(setPageState, {noMoreDataLabel: true})
 
@@ -115,7 +113,7 @@ const UserPage = () => {
   const useUsers = () => {
     const {data, error, isValidating, mutate} = useSWR(
       {
-        url: 'user-list',
+        url: 'user-lists',
         args: {limit: 15, offset: 0, tglSort: tglSort ? 'ASC' : 'DESC', search},
       },
       fetchUsers,
@@ -266,6 +264,7 @@ const UserPage = () => {
           </>
         </div>
       ) : null}
+
       <MainFloatingButton
         scrollToTop={scrollToTop}
         refreshPage={() => {
@@ -273,14 +272,14 @@ const UserPage = () => {
           mutateUser()
         }}
       />
-      <GlobalAlert
-        label="Error saat mengambil data user"
-        onClose={() => setMultiState(setPageState, {err: false})}
-        opened={isError}
-        promptDialog
+
+      <FullPageWarning
+        label="Gagal saat memuat data user, silakan coba kembali !!!"
+        displayed={isError}
       />
+
       {/* Section tambah edit user */}
-      {modifyUserModalVisible && (
+      {modifyUserModalVisible && !isError ? (
         <ModalCreateUser
           open={modifyUserModalVisible}
           closeHandler={() =>
@@ -325,7 +324,7 @@ const UserPage = () => {
             fullWidth
           />
         </ModalCreateUser>
-      )}
+      ) : null}
     </>
   )
 }
