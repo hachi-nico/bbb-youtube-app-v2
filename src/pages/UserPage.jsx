@@ -3,6 +3,7 @@ import axios from 'axios'
 import {useHistory} from 'react-router-dom'
 import dayjs from 'dayjs'
 import 'dayjs/locale/id'
+import useSWR from 'swr'
 
 import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
@@ -23,16 +24,13 @@ import {mainDateTimeFormat} from '../config/globalvar'
 
 const UserPage = () => {
   dayjs.locale('id')
-  const [userList, setUserList] = useState([])
   const [pageState, setPageState] = useState({
-    loading: false,
-    err: false,
-    errMsg: '',
-    offset: 0,
-    moreData: false,
     noMoreDataLabel: false,
     modifyUserModalVisible: false,
+    fetchMoreLoad: false,
+
     tglSort: false,
+    search: '',
   })
   const [form, setForm] = useState({
     username: '',
@@ -44,17 +42,6 @@ const UserPage = () => {
     passwordRepeat: '',
     passwordRepeatErr: false,
   })
-  const history = useHistory()
-  const {
-    errMsg,
-    err,
-    loading,
-    offset,
-    moreData,
-    noMoreDataLabel,
-    modifyUserModalVisible,
-    tglSort,
-  } = pageState
   const {
     username,
     usernameErr,
@@ -65,82 +52,92 @@ const UserPage = () => {
     passwordRepeat,
     passwordRepeatErr,
   } = form
-  const isFirstRender = useRef(true)
+  const {
+    noMoreDataLabel,
+    modifyUserModalVisible,
+    tglSort,
+    fetchMoreLoad,
+    search,
+  } = pageState
 
+  const history = useHistory()
+  const firstRender = useRef(true)
   useEffect(() => {
-    const controller = new AbortController()
-    if (isFirstRender.current) {
-      isFirstRender.current = false
-
+    if (firstRender.current) {
+      firstRender.current = false
       document.title = 'Manajemen User'
-      setMultiState(setPageState, {loading: true})
-      const init = async () => {
-        await fetchUser()
+      mutateUser()
+    }
+  }, [])
+
+  const fetchUsers = async args => {
+    const {data} = await axios.post(baseUrl + args.url, args.args, {
+      headers: {
+        authorization: getLocalToken(),
+      },
+    })
+    isSessionExp(data.status, history)
+    if (data.status != 1) {
+      const e = new Error()
+      throw e
+    }
+
+    return data
+  }
+
+  const fethMoreUsers = async () => {
+    await mutateUser(
+      async prevData => {
+        const nextData = await fetchUsers({
+          url: 'user-list',
+          args: {
+            limit: 15,
+            offset: data?.users.length,
+            tglSort: tglSort ? 'ASC' : 'DESC',
+            search,
+          },
+        })
+        console.log(nextData, 'next')
+        console.log(prevData, 'prev')
+        if (nextData.users.length <= 0)
+          setMultiState(setPageState, {noMoreDataLabel: true})
+
+        return {
+          status: nextData.status,
+          message: nextData.message,
+          users: [...prevData.users, ...nextData.users],
+        }
+      },
+      {revalidate: false}
+    )
+  }
+
+  const useUsers = () => {
+    const {data, error, isValidating, mutate} = useSWR(
+      {
+        url: 'user-list',
+        args: {limit: 15, offset: 0, tglSort: tglSort ? 'ASC' : 'DESC', search},
+      },
+      fetchUsers,
+      {
+        revalidateIfStale: false,
+        revalidateOnFocus: false,
       }
-      init()
+    )
+    return {
+      data,
+      isLoading: !error && !data,
+      isError: error,
+      isValidating,
+      mutateUser: mutate,
     }
-
-    const listenSorting = async () => {
-      resetPageState()
-      setUserList([])
-      await fetchUser(true, {tglSort: tglSort ? 'ASC' : 'DESC'})
-    }
-    listenSorting()
-
-    return () => controller.abort()
-  }, [tglSort])
-
+  }
+  const {data, isError, isLoading, isValidating, mutateUser} = useUsers()
   const setMultiState = (setStateName, obj) => {
     setStateName(s => ({
       ...s,
       ...obj,
     }))
-  }
-
-  const fetchUser = async (isRefresh = false, additionalParams = {}) => {
-    try {
-      const {data} = await axios.post(
-        baseUrl + 'user-list',
-        {
-          limit: 15,
-          offset: isRefresh ? 0 : offset,
-          ...additionalParams,
-        },
-        {
-          headers: {
-            authorization: getLocalToken(),
-          },
-        }
-      )
-      if (data.status == 1) {
-        const {users} = data
-        setMultiState(setPageState, {
-          loading: false,
-          offset: isRefresh ? 0 : userList.length + users.length,
-        })
-
-        if (users.length <= 0 && !isRefresh)
-          setMultiState(setPageState, {noMoreDataLabel: true})
-
-        isRefresh ? setUserList(users) : setUserList([...userList, ...users])
-      } else {
-        isSessionExp(data.status, history)
-        setMultiState(setPageState, {
-          loading: false,
-          err: true,
-          errMsg: data.message ?? 'Gagal saat mengambil data list User',
-        })
-      }
-    } catch (e) {
-      isSessionExp(e.response.data.status, history)
-      setMultiState(setPageState, {
-        loading: false,
-        err: true,
-        errMsg: `[CEA] ${
-          e.response.data.message ?? 'Gagal saat mengambil data list User'
-        } `,
-      })
-    }
   }
 
   const resetForm = () => {
@@ -158,12 +155,9 @@ const UserPage = () => {
 
   const resetPageState = () => {
     setMultiState(setPageState, {
-      loading: true,
-      err: false,
-      errMsg: '',
-      offset: 0,
-      moreData: false,
       noMoreDataLabel: false,
+      tglSort: false,
+      search: '',
     })
   }
 
@@ -172,43 +166,34 @@ const UserPage = () => {
     setMultiState(setForm, {[key]: event.target.value})
   }
 
+  const searchHandler = event => {
+    if (event.keyCode == 13) {
+      setMultiState(setPageState, {search: event.target.value})
+    }
+  }
+
   const getRoleName = role => {
     return role == 1 ? 'Super user' : role == 2 ? 'Dosen' : 'Mahasiswa'
   }
 
+  if (isLoading || isValidating) {
+    return <FullScreenLoader />
+  }
+
   return (
     <>
-      <MainFloatingButton
-        scrollToTop={scrollToTop}
-        refreshPage={async () => {
-          resetPageState()
-          setMultiState(setPageState, {tglSort: false})
-          setUserList([])
-          await fetchUser(true)
-        }}
-      />
-      {loading && <FullScreenLoader />}
-
-      {/* Error Alert */}
-      <GlobalAlert
-        label={errMsg}
-        onClose={() => setMultiState(setPageState, {err: false})}
-        opened={err}
-        promptDialog
-      />
-
       <PlainCard label="Manajemen User" />
-      <div style={{marginTop: 26, marginBottom: 20}}>
-        <Button
-          variant="contained"
-          sx={{backgroundColor: green, mb: 2}}
-          onClick={() =>
-            setMultiState(setPageState, {modifyUserModalVisible: true})
-          }
-        >
-          Tambah User
-        </Button>
-        {!err && !loading && userList.length > 0 ? (
+      {data && !isError ? (
+        <div style={{marginTop: 26, marginBottom: 20}}>
+          <Button
+            variant="contained"
+            sx={{backgroundColor: green, mb: 2}}
+            onClick={() =>
+              setMultiState(setPageState, {modifyUserModalVisible: true})
+            }
+          >
+            Tambah User
+          </Button>
           <>
             <GlobalTable
               headingList={[
@@ -220,12 +205,26 @@ const UserPage = () => {
                   label: 'Tanggal Dibuat',
                   sort: true,
                   sortType: tglSort,
-                  handler: () =>
-                    setPageState(s => ({...s, tglSort: !s.tglSort})),
+                  handler: () => {
+                    mutateUser()
+                    setPageState(s => ({...s, tglSort: !s.tglSort}))
+                  },
                 },
               ]}
             >
-              {userList.map((item, i) => (
+              <TableRow>
+                {/* <TableCell /> */}
+                <TableCell colSpan={5}>
+                  <TextField
+                    size="small"
+                    label="Cari berdasarkan Nama / Username"
+                    variant="outlined"
+                    onKeyDown={val => searchHandler(val)}
+                    fullWidth
+                  />
+                </TableCell>
+              </TableRow>
+              {data.users.map((item, i) => (
                 <TableRow
                   key={i}
                   sx={{'&:last-child td, &:last-child th': {border: 0}}}
@@ -244,24 +243,42 @@ const UserPage = () => {
                 </TableRow>
               ))}
             </GlobalTable>
-            <div
-              style={{display: 'flex', flexDirection: 'column', marginTop: 20}}
-            >
-              <FetchMoreButton
-                label="Muat Lebih Banyak"
-                onClick={async () => {
-                  setMultiState(setPageState, {moreData: true})
-                  await fetchUser()
-                  setMultiState(setPageState, {moreData: false})
+            {data.users.length > 0 && (
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  marginTop: 20,
                 }}
-                moreData={moreData}
-                noMoreDataLabel={noMoreDataLabel}
-              />
-            </div>
+              >
+                <FetchMoreButton
+                  label="Muat Lebih Banyak"
+                  onClick={async () => {
+                    setMultiState(setPageState, {fetchMoreLoad: true})
+                    await fethMoreUsers()
+                    setMultiState(setPageState, {fetchMoreLoad: false})
+                  }}
+                  moreData={fetchMoreLoad}
+                  noMoreDataLabel={noMoreDataLabel}
+                />
+              </div>
+            )}
           </>
-        ) : null}
-      </div>
-
+        </div>
+      ) : null}
+      <MainFloatingButton
+        scrollToTop={scrollToTop}
+        refreshPage={() => {
+          resetPageState()
+          mutateUser()
+        }}
+      />
+      <GlobalAlert
+        label="Error saat mengambil data user"
+        onClose={() => setMultiState(setPageState, {err: false})}
+        opened={isError}
+        promptDialog
+      />
       {/* Section tambah edit user */}
       {modifyUserModalVisible && (
         <ModalCreateUser
@@ -313,10 +330,6 @@ const UserPage = () => {
   )
 }
 
-const s = {
-  textField: {
-    my: 2,
-  },
-}
+const s = {textField: {my: 2}}
 
 export default UserPage
