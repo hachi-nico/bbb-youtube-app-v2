@@ -8,9 +8,10 @@ import TableRow from '@mui/material/TableRow'
 import TableSortLabel from '@mui/material/TableSortLabel'
 import Paper from '@mui/material/Paper'
 
-const GlobalTable = ({headingList = [], children}) => {
+const GlobalTable = ({headingList = [], children, filterComponents = null}) => {
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} sx={{pt: 2}}>
+      {filterComponents}
       <Table sx={{minWidth: 650}} aria-label="simple table">
         <TableHead>
           <TableRow>

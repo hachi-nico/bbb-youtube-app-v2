@@ -9,6 +9,10 @@ import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
+import Select from '@mui/material/Select'
+import MenuItem from '@mui/material/MenuItem'
+import InputLabel from '@mui/material/InputLabel'
+import FormControl from '@mui/material/FormControl'
 
 import GlobalTable from '../components/GlobalTable'
 import PlainCard from '../components/PlainCard'
@@ -30,6 +34,7 @@ const UserPage = () => {
     fetchMoreLoad: false,
 
     tglSort: false,
+    roleSort: '',
     search: '',
   })
   const [form, setForm] = useState({
@@ -58,6 +63,7 @@ const UserPage = () => {
     tglSort,
     fetchMoreLoad,
     search,
+    roleSort,
   } = pageState
 
   const history = useHistory()
@@ -71,18 +77,18 @@ const UserPage = () => {
   }, [])
 
   const fetchUsers = async args => {
-    const {data} = await axios.post(baseUrl + args.url, args.args, {
-      headers: {
-        authorization: getLocalToken(),
-      },
-    })
-    isSessionExp(data.status, history)
-    if (data.status != 1) {
-      const e = new Error()
+    try {
+      const {data} = await axios.post(baseUrl + args.url, args.args, {
+        headers: {
+          authorization: getLocalToken(),
+        },
+      })
+      if (data.status != 1) throw 'Gagal Memuat'
+      return data
+    } catch (e) {
+      isSessionExp(e?.response.data.status, history)
       throw e
     }
-
-    return data
   }
 
   const fethMoreUsers = async () => {
@@ -94,12 +100,12 @@ const UserPage = () => {
             limit: 15,
             offset: data?.users.length,
             tglSort: tglSort ? 'ASC' : 'DESC',
+            tipe: roleSort,
             search,
           },
         })
         if (nextData.users.length <= 0)
           setMultiState(setPageState, {noMoreDataLabel: true})
-
         return {
           status: nextData.status,
           message: nextData.message,
@@ -113,8 +119,14 @@ const UserPage = () => {
   const useUsers = () => {
     const {data, error, isValidating, mutate} = useSWR(
       {
-        url: 'user-lists',
-        args: {limit: 15, offset: 0, tglSort: tglSort ? 'ASC' : 'DESC', search},
+        url: 'user-list',
+        args: {
+          limit: 15,
+          offset: 0,
+          tglSort: tglSort ? 'ASC' : 'DESC',
+          tipe: roleSort,
+          search,
+        },
       },
       fetchUsers,
       {
@@ -155,6 +167,7 @@ const UserPage = () => {
     setMultiState(setPageState, {
       noMoreDataLabel: false,
       tglSort: false,
+      roleSort: '',
       search: '',
     })
   }
@@ -170,6 +183,10 @@ const UserPage = () => {
     }
   }
 
+  const selectHandler = event => {
+    setMultiState(setPageState, {roleSort: event.target.value})
+  }
+
   const getRoleName = role => {
     return role == 1 ? 'Super user' : role == 2 ? 'Dosen' : 'Mahasiswa'
   }
@@ -177,6 +194,22 @@ const UserPage = () => {
   if (isLoading || isValidating) {
     return <FullScreenLoader />
   }
+
+  const headingList = [
+    {label: 'No.'},
+    {label: 'Nama'},
+    {label: 'Username'},
+    {label: 'Role'},
+    {
+      label: 'Tanggal Dibuat',
+      sort: true,
+      sortType: tglSort,
+      handler: () => {
+        mutateUser()
+        setPageState(s => ({...s, tglSort: !s.tglSort}))
+      },
+    },
+  ]
 
   return (
     <>
@@ -194,34 +227,32 @@ const UserPage = () => {
           </Button>
           <>
             <GlobalTable
-              headingList={[
-                {label: 'No.'},
-                {label: 'Nama'},
-                {label: 'Username'},
-                {label: 'Role'},
-                {
-                  label: 'Tanggal Dibuat',
-                  sort: true,
-                  sortType: tglSort,
-                  handler: () => {
-                    mutateUser()
-                    setPageState(s => ({...s, tglSort: !s.tglSort}))
-                  },
-                },
-              ]}
-            >
-              <TableRow>
-                {/* <TableCell /> */}
-                <TableCell colSpan={5}>
+              headingList={headingList}
+              filterComponents={
+                <div style={{display: 'flex', flexDirection: 'row'}}>
                   <TextField
                     size="small"
-                    label="Cari berdasarkan Nama / Username"
+                    placeholder="Cari berdasarkan Nama / Username"
                     variant="outlined"
                     onKeyDown={val => searchHandler(val)}
+                    sx={{pb: 1, px: 1.5}}
                     fullWidth
                   />
-                </TableCell>
-              </TableRow>
+                  <FormControl sx={{minWidth: 150, pr: 1.5}} size="small">
+                    <InputLabel id="role">Role</InputLabel>
+                    <Select
+                      value={roleSort}
+                      id="role"
+                      label="Role"
+                      onChange={selectHandler}
+                    >
+                      <MenuItem value={2}>Dosen</MenuItem>
+                      <MenuItem value={1}>Super Admin</MenuItem>
+                    </Select>
+                  </FormControl>
+                </div>
+              }
+            >
               {data.users.map((item, i) => (
                 <TableRow
                   key={i}
