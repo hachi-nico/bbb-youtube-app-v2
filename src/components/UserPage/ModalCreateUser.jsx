@@ -88,7 +88,7 @@ function ModalCreateUser({
       return false
     }
 
-    return getFormData({username, password, nama, role})
+    return getFormData({username, password, nama, tipe: role})
   }
 
   return (

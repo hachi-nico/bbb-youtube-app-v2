@@ -10,6 +10,7 @@ import TableCell from '@mui/material/TableCell'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 
+import GlobalAlert from '../components/GlobalAlert'
 import GlobalTable from '../components/GlobalTable'
 import PlainCard from '../components/PlainCard'
 import FullPageWarning from '../components/FullPageWarning'
@@ -27,20 +28,24 @@ const UserPage = () => {
   dayjs.locale('id')
   const [pageState, setPageState] = useState({
     noMoreDataLabel: false,
-    modifyUserModalVisible: false,
+    createUserModalOpened: false,
     fetchMoreLoad: false,
 
     tglSort: false,
     roleSort: '',
     search: '',
+    alertLabel: '',
+    alertOpen: false,
   })
   const {
     noMoreDataLabel,
-    modifyUserModalVisible,
+    createUserModalOpened,
     tglSort,
     fetchMoreLoad,
     search,
     roleSort,
+    alertLabel,
+    alertOpen,
   } = pageState
 
   const history = useHistory()
@@ -49,18 +54,18 @@ const UserPage = () => {
     if (firstRender.current) {
       firstRender.current = false
       document.title = 'Manajemen User'
-      mutateUser()
     }
+    mutateUser()
   }, [])
 
-  const fetchUsers = async args => {
+  const fetchApi = async args => {
     try {
       const {data} = await axios.post(baseUrl + args.url, args.args, {
         headers: {
           authorization: getLocalToken(),
         },
       })
-      if (data.status != 1) throw 'Gagal Memuat'
+      if (data.status != 1) throw 'Gagal'
       return data
     } catch (e) {
       isSessionExp(e?.response.data.status, history)
@@ -71,7 +76,7 @@ const UserPage = () => {
   const fethMoreUsers = async () => {
     await mutateUser(
       async prevData => {
-        const nextData = await fetchUsers({
+        const nextData = await fetchApi({
           url: 'user-list',
           args: {
             limit: 15,
@@ -105,7 +110,7 @@ const UserPage = () => {
           search,
         },
       },
-      fetchUsers,
+      fetchApi,
       {
         revalidateIfStale: false,
         revalidateOnFocus: false,
@@ -150,6 +155,34 @@ const UserPage = () => {
     return role == 1 ? 'Super user' : role == 2 ? 'Dosen' : 'Mahasiswa'
   }
 
+  const addUserHandler = async val => {
+    try {
+      await fetchApi({
+        url: 'add-user',
+        args: {
+          ...val,
+        },
+      })
+    } catch (e) {
+      setPageState(s => ({
+        ...s,
+        alertLabel: 'Gagal Saat menambahkan user, silakan coba kembali !!!',
+        alertOpen: true,
+      }))
+    } finally {
+      setMultiState(setPageState, {createUserModalOpened: false})
+      mutateUser()
+    }
+  }
+
+  const closeAlertHandler = () => {
+    setPageState(s => ({
+      ...s,
+      alertLabel: '',
+      alertOpen: false,
+    }))
+  }
+
   if (isLoading || isValidating) {
     return <FullScreenLoader />
   }
@@ -179,7 +212,7 @@ const UserPage = () => {
             variant="contained"
             sx={{backgroundColor: green, mb: 2}}
             onClick={() =>
-              setMultiState(setPageState, {modifyUserModalVisible: true})
+              setMultiState(setPageState, {createUserModalOpened: true})
             }
           >
             Tambah User
@@ -220,7 +253,7 @@ const UserPage = () => {
                   sx={{'&:last-child td, &:last-child th': {border: 0}}}
                 >
                   <TableCell>{i + 1}</TableCell>
-                  <TableCell>{item.nama}</TableCell>
+                  <TableCell>{`${item.nama ? item.nama : ' - '}`}</TableCell>
                   <TableCell>{item.username}</TableCell>
                   <TableCell>{getRoleName(item.tipe)}</TableCell>
                   <TableCell>
@@ -270,14 +303,20 @@ const UserPage = () => {
         displayed={isError}
       />
 
-      {/* Section tambah edit user */}
-      {modifyUserModalVisible && !isError ? (
+      <GlobalAlert
+        label={alertLabel}
+        opened={alertOpen}
+        onClose={closeAlertHandler}
+        promptDialog
+      />
+
+      {createUserModalOpened && !isError ? (
         <ModalCreateUser
-          open={modifyUserModalVisible}
+          open={createUserModalOpened}
           closeHandler={() =>
-            setMultiState(setPageState, {modifyUserModalVisible: false})
+            setMultiState(setPageState, {createUserModalOpened: false})
           }
-          getFormData={val => console.log(val)}
+          getFormData={async val => addUserHandler(val)}
         />
       ) : null}
     </>
