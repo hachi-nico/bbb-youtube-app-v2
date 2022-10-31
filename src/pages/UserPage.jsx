@@ -206,8 +206,9 @@ const UserPage = () => {
                     addtionalSx={{pr: 1.5}}
                     selectHandler={selectHandler}
                     items={[
+                      {label: 'Mahasiswa', value: 3},
                       {label: 'Dosen', value: 2},
-                      {label: 'Super Admin', value: 1},
+                      {label: 'Super ', value: 1},
                     ]}
                   />
                 </div>
@@ -276,6 +277,7 @@ const UserPage = () => {
           closeHandler={() =>
             setMultiState(setPageState, {modifyUserModalVisible: false})
           }
+          getFormData={val => console.log(val)}
         />
       ) : null}
     </>

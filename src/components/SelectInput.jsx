@@ -8,6 +8,7 @@ import FormControl from '@mui/material/FormControl'
 function SelectInput({
   width = 150,
   addtionalSx = {},
+  labelSx = {},
   label = '',
   items = [],
   selectHandler = () => {},
@@ -15,8 +16,10 @@ function SelectInput({
 }) {
   return (
     <FormControl sx={{minWidth: width, ...addtionalSx}} size="small">
-      <InputLabel id="role">{label}</InputLabel>
-      <Select value={value} id="role" label={label} onChange={selectHandler}>
+      <InputLabel  sx={labelSx}>
+        {label}
+      </InputLabel>
+      <Select value={value}  label={label} onChange={selectHandler}>
         {items.map((item, i) => (
           <MenuItem key={i} value={item.value}>
             {item.label}

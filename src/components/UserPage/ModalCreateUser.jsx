@@ -6,15 +6,19 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import Dialog from '@mui/material/Dialog'
 import TextField from '@mui/material/TextField'
+import Box from '@mui/material/Box'
+
+import SelectInput from '../SelectInput'
 
 function ModalCreateUser({
   closeHandler = () => {},
-  submitHandler = () => {},
   open = false,
+  getFormData = () => {},
 }) {
   const [form, setForm] = useState({
     username: '',
     usernameErr: false,
+    usernameErrLabel: '',
     nama: '',
     role: 2,
     password: '',
@@ -26,6 +30,7 @@ function ModalCreateUser({
   const {
     username,
     usernameErr,
+    usernameErrLabel,
     nama,
     role,
     password,
@@ -35,7 +40,11 @@ function ModalCreateUser({
   } = form
 
   const formInputHandler = (key, event) => {
-    if (username) setMultiState(setPageState, {usernameErr: false})
+    if (username)
+      setForm(s => ({...s, usernameErr: false, usernameErrLabel: ''}))
+    if (password) setForm(s => ({...s, passwordErr: false}))
+    if (password == passwordRepeat)
+      setForm(s => ({...s, passwordRepeatErr: false}))
     setForm(s => ({...s, [key]: event.target.value}))
   }
 
@@ -43,6 +52,7 @@ function ModalCreateUser({
     setForm({
       username: '',
       usernameErr: '',
+      usernameErrLabel: '',
       nama: '',
       role: '',
       password: '',
@@ -50,6 +60,35 @@ function ModalCreateUser({
       passwordRepeat: '',
       passwordRepeatErr: '',
     })
+  }
+
+  const submitHandler = () => {
+    if (!username) {
+      setForm(s => ({...s, usernameErr: true}))
+      return false
+    }
+
+    if (!password) {
+      setForm(s => ({...s, passwordErr: true}))
+      return false
+    }
+
+    if (password != passwordRepeat) {
+      setForm(s => ({...s, passwordRepeatErr: true}))
+      return false
+    }
+
+    const regExp = /[-!$%^&*()_+|~=`{}\[\]:\/;<>?,.@#]/
+    if (regExp.test(username)) {
+      setForm(s => ({
+        ...s,
+        usernameErr: true,
+        usernameErrLabel: 'Username tidak boleh berisi karakter spesial',
+      }))
+      return false
+    }
+
+    return getFormData({username, password, nama, role})
   }
 
   return (
@@ -60,19 +99,39 @@ function ModalCreateUser({
       sx={{m: {md: 12, xs: 4}}}
     >
       <DialogTitle sx={{textAlign: 'center'}}>Tambah Data Baru</DialogTitle>
-      <DialogContent>
-        <TextField
-          error={usernameErr}
-          value={username}
-          sx={s.textField}
-          label="Username"
-          variant="standard"
-          onChange={val => formInputHandler('username', val)}
-          fullWidth
-          inputProps={{
-            autoComplete: 'new-password',
+      <DialogContent sx={{pb: 1}}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: {md: 'row', xs: 'column'},
+            pt: 2,
           }}
-        />
+        >
+          <TextField
+            error={usernameErr}
+            value={username}
+            helperText={usernameErrLabel}
+            label="Username"
+            variant="standard"
+            onChange={val => formInputHandler('username', val)}
+            fullWidth
+            inputProps={{
+              autoComplete: 'new-password',
+            }}
+            sx={{pr: 1}}
+          />
+          <SelectInput
+            label="Role"
+            value={role}
+            addtionalSx={{pt: {xs: 4, md: 1}}}
+            labelSx={{pt: {xs: 5, md: 1}}}
+            selectHandler={e => formInputHandler('role', e)}
+            items={[
+              {label: 'Dosen', value: 2},
+              {label: 'Mahasiswa', value: 3},
+            ]}
+          />
+        </Box>
         <TextField
           value={nama}
           sx={s.textField}
@@ -104,6 +163,7 @@ function ModalCreateUser({
           label="Ulangi Password"
           variant="standard"
           type="password"
+          helperText={passwordRepeatErr ? 'Password tidak cocok' : ''}
           onChange={val => formInputHandler('passwordRepeat', val)}
           fullWidth
         />
