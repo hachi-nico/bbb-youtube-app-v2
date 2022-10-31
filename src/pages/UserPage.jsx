@@ -9,10 +9,6 @@ import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
-import Select from '@mui/material/Select'
-import MenuItem from '@mui/material/MenuItem'
-import InputLabel from '@mui/material/InputLabel'
-import FormControl from '@mui/material/FormControl'
 
 import GlobalTable from '../components/GlobalTable'
 import PlainCard from '../components/PlainCard'
@@ -21,6 +17,7 @@ import FullScreenLoader from '../components/FullScreenLoader'
 import FetchMoreButton from '../components/FetchMoreButton'
 import MainFloatingButton from '../components/MainFloatingButton'
 import ModalCreateUser from '../components/UserPage/ModalCreateUser'
+import SelectInput from '../components/SelectInput'
 import {getLocalToken, isSessionExp, scrollToTop} from '../utils/globalFunction'
 import {baseUrl} from '../config/api'
 import {green} from '../config/color'
@@ -37,26 +34,6 @@ const UserPage = () => {
     roleSort: '',
     search: '',
   })
-  const [form, setForm] = useState({
-    username: '',
-    usernameErr: false,
-    nama: '',
-    role: 2,
-    password: '',
-    passwordErr: false,
-    passwordRepeat: '',
-    passwordRepeatErr: false,
-  })
-  const {
-    username,
-    usernameErr,
-    nama,
-    role,
-    password,
-    passwordErr,
-    passwordRepeat,
-    passwordRepeatErr,
-  } = form
   const {
     noMoreDataLabel,
     modifyUserModalVisible,
@@ -150,19 +127,6 @@ const UserPage = () => {
     }))
   }
 
-  const resetForm = () => {
-    setMultiState(setForm, {
-      username: '',
-      usernameErr: '',
-      nama: '',
-      role: '',
-      password: '',
-      passwordErr: '',
-      passwordRepeat: '',
-      passwordRepeatErr: '',
-    })
-  }
-
   const resetPageState = () => {
     setMultiState(setPageState, {
       noMoreDataLabel: false,
@@ -170,11 +134,6 @@ const UserPage = () => {
       roleSort: '',
       search: '',
     })
-  }
-
-  const formInputHandler = (key, event) => {
-    if (username) setMultiState(setPageState, {usernameErr: false})
-    setMultiState(setForm, {[key]: event.target.value})
   }
 
   const searchHandler = event => {
@@ -237,19 +196,20 @@ const UserPage = () => {
                     onKeyDown={val => searchHandler(val)}
                     sx={{pb: 1, px: 1.5}}
                     fullWidth
+                    inputProps={{
+                      autoComplete: 'new-password',
+                    }}
                   />
-                  <FormControl sx={{minWidth: 150, pr: 1.5}} size="small">
-                    <InputLabel id="role">Role</InputLabel>
-                    <Select
-                      value={roleSort}
-                      id="role"
-                      label="Role"
-                      onChange={selectHandler}
-                    >
-                      <MenuItem value={2}>Dosen</MenuItem>
-                      <MenuItem value={1}>Super Admin</MenuItem>
-                    </Select>
-                  </FormControl>
+                  <SelectInput
+                    label="Role"
+                    value={roleSort}
+                    addtionalSx={{pr: 1.5}}
+                    selectHandler={selectHandler}
+                    items={[
+                      {label: 'Dosen', value: 2},
+                      {label: 'Super Admin', value: 1},
+                    ]}
+                  />
                 </div>
               }
             >
@@ -316,50 +276,10 @@ const UserPage = () => {
           closeHandler={() =>
             setMultiState(setPageState, {modifyUserModalVisible: false})
           }
-        >
-          <TextField
-            error={usernameErr}
-            value={username}
-            sx={s.textField}
-            label="Username"
-            variant="standard"
-            onChange={val => formInputHandler('username', val)}
-            fullWidth
-          />
-          <TextField
-            value={nama}
-            sx={s.textField}
-            label="Nama"
-            variant="standard"
-            onChange={val => formInputHandler('nama', val)}
-            fullWidth
-          />
-          <TextField
-            error={passwordErr}
-            value={password}
-            sx={s.textField}
-            label="Password"
-            variant="standard"
-            type="password"
-            onChange={val => formInputHandler('password', val)}
-            fullWidth
-          />
-          <TextField
-            error={passwordRepeatErr}
-            value={passwordRepeat}
-            sx={s.textField}
-            label="Ulangi Password"
-            variant="standard"
-            type="password"
-            onChange={val => formInputHandler('passwordRepeat', val)}
-            fullWidth
-          />
-        </ModalCreateUser>
+        />
       ) : null}
     </>
   )
 }
-
-const s = {textField: {my: 2}}
 
 export default UserPage
