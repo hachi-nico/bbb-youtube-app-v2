@@ -12,7 +12,7 @@ const GlobalTable = ({headingList = [], children, filterComponents = null}) => {
   return (
     <TableContainer component={Paper} sx={{pt: 2}}>
       {filterComponents}
-      <Table sx={{minWidth: 650}} aria-label="simple table">
+      <Table sx={{minWidth: 700}} aria-label="simple table">
         <TableHead>
           <TableRow>
             {headingList.map((item, i) => {

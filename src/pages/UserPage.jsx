@@ -9,6 +9,11 @@ import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
+import Collapse from '@mui/material/Collapse'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
+import BorderColorIcon from '@mui/icons-material/BorderColor'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 import GlobalAlert from '../components/GlobalAlert'
 import GlobalTable from '../components/GlobalTable'
@@ -23,6 +28,7 @@ import {getLocalToken, isSessionExp, scrollToTop} from '../utils/globalFunction'
 import {baseUrl} from '../config/api'
 import {green} from '../config/color'
 import {mainDateTimeFormat} from '../config/globalvar'
+import {IconButton} from '@mui/material'
 
 const UserPage = () => {
   dayjs.locale('id')
@@ -36,6 +42,8 @@ const UserPage = () => {
     search: '',
     alertLabel: '',
     alertOpen: false,
+    collapseOpen: false,
+    collapseIndex: '',
   })
   const {
     noMoreDataLabel,
@@ -46,6 +54,8 @@ const UserPage = () => {
     roleSort,
     alertLabel,
     alertOpen,
+    collapseOpen,
+    collapseIndex,
   } = pageState
 
   const history = useHistory()
@@ -188,7 +198,7 @@ const UserPage = () => {
   }
 
   const headingList = [
-    {label: 'No.'},
+    {label: 'Aksi'},
     {label: 'Nama'},
     {label: 'Username'},
     {label: 'Role'},
@@ -252,7 +262,55 @@ const UserPage = () => {
                   key={i}
                   sx={{'&:last-child td, &:last-child th': {border: 0}}}
                 >
-                  <TableCell>{i + 1}</TableCell>
+                  <TableCell>
+                    <IconButton
+                      onClick={() => {
+                        setPageState(s => ({
+                          ...s,
+                          collapseIndex: i,
+                          collapseOpen: !s.collapseOpen,
+                        }))
+                      }}
+                    >
+                      {collapseOpen && i == collapseIndex ? (
+                        <KeyboardArrowUpIcon />
+                      ) : (
+                        <KeyboardArrowDownIcon />
+                      )}
+                    </IconButton>
+                    <Collapse
+                      in={collapseOpen && i == collapseIndex}
+                      timeout="auto"
+                      unmountOnExit
+                    >
+                      <div
+                        style={{
+                          marginTop: 20,
+                          marginLeft: 5,
+                          display: 'flex',
+                          flexDirection: 'column',
+                        }}
+                      >
+                        <Button
+                          color="info"
+                          startIcon={<BorderColorIcon />}
+                          variant="outlined"
+                          size="small"
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          color="error"
+                          startIcon={<DeleteIcon />}
+                          variant="outlined"
+                          size="small"
+                          sx={{mt: 1}}
+                        >
+                          Hapus
+                        </Button>
+                      </div>
+                    </Collapse>
+                  </TableCell>
                   <TableCell>{`${item.nama ? item.nama : ' - '}`}</TableCell>
                   <TableCell>{item.username}</TableCell>
                   <TableCell>{getRoleName(item.tipe)}</TableCell>
