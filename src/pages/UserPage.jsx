@@ -15,19 +15,18 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import DeleteIcon from '@mui/icons-material/Delete'
 
-import GlobalAlert from '../components/GlobalAlert'
-import GlobalTable from '../components/GlobalTable'
+import Alert from '../components/Alert'
+import DataTable from '../components/DataTable'
 import PlainCard from '../components/PlainCard'
 import FullPageWarning from '../components/FullPageWarning'
 import FullScreenLoader from '../components/FullScreenLoader'
 import FetchMoreButton from '../components/FetchMoreButton'
-import MainFloatingButton from '../components/MainFloatingButton'
+import MainFloatingButton from '../components/FloatingActionButton'
 import ModalCreateUser from '../components/UserPage/ModalCreateUser'
 import SelectInput from '../components/SelectInput'
 import {getLocalToken, isSessionExp, scrollToTop} from '../utils/globalFunction'
 import {baseUrl} from '../config/api'
-import {green} from '../config/color'
-import {mainDateTimeFormat} from '../config/globalvar'
+import {mainDateTimeFormat, insertDateTimeFormat} from '../config/globalvar'
 import {IconButton} from '@mui/material'
 
 const UserPage = () => {
@@ -83,31 +82,6 @@ const UserPage = () => {
     }
   }
 
-  const fethMoreUsers = async () => {
-    await mutateUser(
-      async prevData => {
-        const nextData = await fetchApi({
-          url: 'user-list',
-          args: {
-            limit: 15,
-            offset: data?.users.length,
-            tglSort: tglSort ? 'ASC' : 'DESC',
-            tipe: roleSort,
-            search,
-          },
-        })
-        if (nextData.users.length <= 0)
-          setMultiState(setPageState, {noMoreDataLabel: true})
-        return {
-          status: nextData.status,
-          message: nextData.message,
-          users: [...prevData.users, ...nextData.users],
-        }
-      },
-      {revalidate: false}
-    )
-  }
-
   const useUsers = () => {
     const {data, error, isValidating, mutate} = useSWR(
       {
@@ -142,12 +116,40 @@ const UserPage = () => {
     }))
   }
 
+  if (isLoading || isValidating) return <FullScreenLoader />
+
+  const fethMoreUsers = async () => {
+    await mutateUser(
+      async prevData => {
+        const nextData = await fetchApi({
+          url: 'user-list',
+          args: {
+            limit: 15,
+            offset: data?.users.length,
+            tglSort: tglSort ? 'ASC' : 'DESC',
+            tipe: roleSort,
+            search,
+          },
+        })
+        if (nextData.users.length <= 0)
+          setMultiState(setPageState, {noMoreDataLabel: true})
+        return {
+          status: nextData.status,
+          message: nextData.message,
+          users: [...prevData.users, ...nextData.users],
+        }
+      },
+      {revalidate: false}
+    )
+  }
+
   const resetPageState = () => {
     setMultiState(setPageState, {
       noMoreDataLabel: false,
       tglSort: false,
       roleSort: '',
       search: '',
+      createUserModalOpened: false,
     })
   }
 
@@ -165,22 +167,23 @@ const UserPage = () => {
     return role == 1 ? 'Super user' : role == 2 ? 'Dosen' : 'Mahasiswa'
   }
 
-  const addUserHandler = async val => {
+  const modifyUserHandler = async (val, action = 'menambahkan') => {
     try {
       await fetchApi({
-        url: 'add-user',
-        args: {
-          ...val,
-        },
+        url: action == 'menambahkan' ? 'add-user' : 'update-user',
+        args:
+          action == 'menghapus'
+            ? {userId: val}
+            : {...val, tgl: dayjs().format(insertDateTimeFormat)},
       })
     } catch (e) {
       setPageState(s => ({
         ...s,
-        alertLabel: 'Gagal Saat menambahkan user, silakan coba kembali !!!',
+        alertLabel: `Gagal Saat ${action} user, silakan coba kembali !!!`,
         alertOpen: true,
       }))
     } finally {
-      setMultiState(setPageState, {createUserModalOpened: false})
+      resetPageState()
       mutateUser()
     }
   }
@@ -199,10 +202,6 @@ const UserPage = () => {
       collapseIndex: i,
       collapseOpen: !s.collapseOpen,
     }))
-  }
-
-  if (isLoading || isValidating) {
-    return <FullScreenLoader />
   }
 
   const headingList = [
@@ -227,7 +226,7 @@ const UserPage = () => {
       {data && !isError ? (
         <div style={{marginTop: 26, marginBottom: 20}}>
           <>
-            <GlobalTable
+            <DataTable
               headingList={headingList}
               filterComponents={
                 <div style={{display: 'flex', flexDirection: 'row'}}>
@@ -250,7 +249,7 @@ const UserPage = () => {
                     items={[
                       {label: 'Mahasiswa', value: 3},
                       {label: 'Dosen', value: 2},
-                      {label: 'Super ', value: 1},
+                      {label: 'Super Admin', value: 1},
                     ]}
                   />
                 </div>
@@ -320,7 +319,7 @@ const UserPage = () => {
                   </TableCell>
                 </TableRow>
               ))}
-            </GlobalTable>
+            </DataTable>
             {data.users.length > 0 && (
               <div
                 style={{
@@ -361,7 +360,7 @@ const UserPage = () => {
         displayed={isError}
       />
 
-      <GlobalAlert
+      <Alert
         label={alertLabel}
         opened={alertOpen}
         onClose={closeAlertHandler}
@@ -374,7 +373,7 @@ const UserPage = () => {
           closeHandler={() =>
             setMultiState(setPageState, {createUserModalOpened: false})
           }
-          getFormData={async val => addUserHandler(val)}
+          getFormData={async val => modifyUserHandler(val)}
         />
       ) : null}
     </>

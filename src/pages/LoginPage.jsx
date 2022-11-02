@@ -10,7 +10,7 @@ import {indigo} from '../config/color'
 import {baseUrl} from '../config/api'
 import CardContainer from '../components/CardContainer'
 import FullScreenLoader from '../components/FullScreenLoader'
-import GlobalAlert from '../components/GlobalAlert'
+import Alert from '../components/Alert'
 
 function LoginPage() {
   const [pageState, setPageState] = useState({
@@ -99,7 +99,7 @@ function LoginPage() {
 
   return (
     <>
-      <GlobalAlert
+      <Alert
         label={errLabel}
         onClose={() => pageStateHandler({alertOpen: false}, 'pageState')}
         opened={alertOpen}

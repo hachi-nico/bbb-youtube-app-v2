@@ -8,7 +8,7 @@ import Box from '@mui/material/Box'
 
 import {green, indigo} from '../config/color'
 
-function MainFloatingButton({addData, refreshPage, scrollToTop}) {
+function FLoatingActionButton({addData, refreshPage, scrollToTop}) {
   return (
     <Box
       sx={{position: 'fixed', bottom: {md: 14, xs: 60}, right: 14, zIndex: 100}}
@@ -38,4 +38,4 @@ function MainFloatingButton({addData, refreshPage, scrollToTop}) {
   )
 }
 
-export default MainFloatingButton
+export default FLoatingActionButton

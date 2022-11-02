@@ -28,7 +28,7 @@ import BottomNavigationAction from '@mui/material/BottomNavigationAction'
 
 import './MainLayout.css'
 import {indigo} from '../config/color'
-import GlobalAlert from '../components/GlobalAlert'
+import Alert from '../components/Alert'
 import {baseUrl} from '../config/api'
 
 const drawerWidth = 240
@@ -133,7 +133,7 @@ function MainLayout({children}) {
 
   return (
     <Box sx={{display: 'flex', flex: 1}}>
-      <GlobalAlert
+      <Alert
         label={'Apakah anda yakin untuk melakukan Log Out ?'}
         onClose={() => {
           setPromptOpen(false)
@@ -146,7 +146,7 @@ function MainLayout({children}) {
         opened={promptOpen}
         confirmDialog
       />
-      <GlobalAlert
+      <Alert
         label={'Gagal saat Log Out'}
         onClose={() => setAlertOpen(false)}
         opened={alertOpen}

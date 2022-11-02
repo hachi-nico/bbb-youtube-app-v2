@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react'
 
 import PlainCard from '../components/PlainCard'
-import GlobalTable from '../components/GlobalTable'
+import DataTable from '../components/DataTable'
 
 const LaporanPage = () => {
   useEffect(() => {
@@ -11,7 +11,7 @@ const LaporanPage = () => {
     <>
       <PlainCard label="Laporan Upload" />
       <div style={{marginTop: 22}}>
-        <GlobalTable />
+        <DataTable />
       </div>
     </>
   )

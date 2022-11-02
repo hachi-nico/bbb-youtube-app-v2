@@ -7,7 +7,7 @@ import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 import Button from '@mui/material/Button'
 
-function GlobalAlert({
+function Alert({
   label = '',
   onClose = () => {},
   onConfirm = () => {},
@@ -41,4 +41,4 @@ function GlobalAlert({
   )
 }
 
-export default GlobalAlert
+export default Alert
