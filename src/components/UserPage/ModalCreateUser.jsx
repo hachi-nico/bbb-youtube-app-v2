@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 
 import Button from '@mui/material/Button'
 import DialogActions from '@mui/material/DialogActions'
@@ -14,6 +14,7 @@ function ModalCreateUser({
   closeHandler = () => {},
   open = false,
   getFormData = () => {},
+  previousData,
 }) {
   const [form, setForm] = useState({
     username: '',
@@ -39,6 +40,11 @@ function ModalCreateUser({
     passwordRepeatErr,
   } = form
 
+  useEffect(() => {
+    if (previousData)
+      setForm(s => ({...s, ...previousData, role: previousData.tipe}))
+  }, [])
+
   const formInputHandler = (key, event) => {
     if (username)
       setForm(s => ({...s, usernameErr: false, usernameErrLabel: ''}))
@@ -48,34 +54,22 @@ function ModalCreateUser({
     setForm(s => ({...s, [key]: event.target.value}))
   }
 
-  const resetForm = () => {
-    setForm({
-      username: '',
-      usernameErr: '',
-      usernameErrLabel: '',
-      nama: '',
-      role: '',
-      password: '',
-      passwordErr: '',
-      passwordRepeat: '',
-      passwordRepeatErr: '',
-    })
-  }
-
   const submitHandler = () => {
     if (!username) {
       setForm(s => ({...s, usernameErr: true}))
       return false
     }
 
-    if (!password) {
-      setForm(s => ({...s, passwordErr: true}))
-      return false
-    }
+    if (!previousData) {
+      if (!password) {
+        setForm(s => ({...s, passwordErr: true}))
+        return false
+      }
 
-    if (password != passwordRepeat) {
-      setForm(s => ({...s, passwordRepeatErr: true}))
-      return false
+      if (password != passwordRepeat) {
+        setForm(s => ({...s, passwordRepeatErr: true}))
+        return false
+      }
     }
 
     const regExp = /[-!$%^&*()_+|~=`{}\[\]:\/;<>?,.@#]/
@@ -88,7 +82,13 @@ function ModalCreateUser({
       return false
     }
 
-    return getFormData({username, password, nama, tipe: role})
+    return getFormData({
+      username,
+      password,
+      nama,
+      tipe: role,
+      userId: previousData ? previousData.user_id : '',
+    })
   }
 
   return (
@@ -143,30 +143,34 @@ function ModalCreateUser({
             autoComplete: 'new-password',
           }}
         />
-        <TextField
-          error={passwordErr}
-          value={password}
-          sx={s.textField}
-          label="Password"
-          variant="standard"
-          type="password"
-          onChange={val => formInputHandler('password', val)}
-          fullWidth
-          inputProps={{
-            autoComplete: 'new-password',
-          }}
-        />
-        <TextField
-          error={passwordRepeatErr}
-          value={passwordRepeat}
-          sx={s.textField}
-          label="Ulangi Password"
-          variant="standard"
-          type="password"
-          helperText={passwordRepeatErr ? 'Password tidak cocok' : ''}
-          onChange={val => formInputHandler('passwordRepeat', val)}
-          fullWidth
-        />
+        {!previousData ? (
+          <>
+            <TextField
+              error={passwordErr}
+              value={password}
+              sx={s.textField}
+              label="Password"
+              variant="standard"
+              type="password"
+              onChange={val => formInputHandler('password', val)}
+              fullWidth
+              inputProps={{
+                autoComplete: 'new-password',
+              }}
+            />
+            <TextField
+              error={passwordRepeatErr}
+              value={passwordRepeat}
+              sx={s.textField}
+              label="Ulangi Password"
+              variant="standard"
+              type="password"
+              helperText={passwordRepeatErr ? 'Password tidak cocok' : ''}
+              onChange={val => formInputHandler('passwordRepeat', val)}
+              fullWidth
+            />
+          </>
+        ) : null}
       </DialogContent>
       <DialogActions>
         <div style={{display: 'flex'}}>

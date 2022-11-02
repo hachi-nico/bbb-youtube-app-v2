@@ -7,13 +7,10 @@ import useSWR from 'swr'
 
 import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
-import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 import Collapse from '@mui/material/Collapse'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
-import BorderColorIcon from '@mui/icons-material/BorderColor'
-import DeleteIcon from '@mui/icons-material/Delete'
 
 import Alert from '../components/Alert'
 import DataTable from '../components/DataTable'
@@ -24,6 +21,7 @@ import FetchMoreButton from '../components/FetchMoreButton'
 import MainFloatingButton from '../components/FloatingActionButton'
 import ModalCreateUser from '../components/UserPage/ModalCreateUser'
 import SelectInput from '../components/SelectInput'
+import ActionButton from '../components/ActionButton'
 import {getLocalToken, isSessionExp, scrollToTop} from '../utils/globalFunction'
 import {baseUrl} from '../config/api'
 import {mainDateTimeFormat, insertDateTimeFormat} from '../config/globalvar'
@@ -31,6 +29,7 @@ import {IconButton} from '@mui/material'
 
 const UserPage = () => {
   dayjs.locale('id')
+  const [previousFormData, setPreviousFormData] = useState('')
   const [pageState, setPageState] = useState({
     noMoreDataLabel: false,
     createUserModalOpened: false,
@@ -66,7 +65,6 @@ const UserPage = () => {
     }
     mutateUser()
   }, [])
-
   const fetchApi = async args => {
     try {
       const {data} = await axios.post(baseUrl + args.url, args.args, {
@@ -168,9 +166,15 @@ const UserPage = () => {
   }
 
   const modifyUserHandler = async (val, action = 'menambahkan') => {
+    resetPageState()
     try {
       await fetchApi({
-        url: action == 'menambahkan' ? 'add-user' : 'update-user',
+        url:
+          action == 'menambahkan'
+            ? 'add-user'
+            : action == 'menghapus'
+            ? 'delete-user'
+            : 'update-user',
         args:
           action == 'menghapus'
             ? {userId: val}
@@ -183,7 +187,6 @@ const UserPage = () => {
         alertOpen: true,
       }))
     } finally {
-      resetPageState()
       mutateUser()
     }
   }
@@ -279,32 +282,18 @@ const UserPage = () => {
                       timeout="auto"
                       unmountOnExit
                     >
-                      <div
-                        style={{
-                          marginTop: 20,
-                          marginLeft: 5,
-                          display: 'flex',
-                          flexDirection: 'column',
+                      <ActionButton
+                        deleteHandler={() =>
+                          modifyUserHandler(data.users[i].user_id, 'menghapus')
+                        }
+                        updateHandler={() => {
+                          setPreviousFormData(data.users[i])
+                          setPageState(s => ({
+                            ...s,
+                            createUserModalOpened: true,
+                          }))
                         }}
-                      >
-                        <Button
-                          color="info"
-                          startIcon={<BorderColorIcon />}
-                          variant="outlined"
-                          size="small"
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          color="error"
-                          startIcon={<DeleteIcon />}
-                          variant="outlined"
-                          size="small"
-                          sx={{mt: 1}}
-                        >
-                          Hapus
-                        </Button>
-                      </div>
+                      />
                     </Collapse>
                   </TableCell>
                   <TableCell>{`${item.nama ? item.nama : ' - '}`}</TableCell>
@@ -370,10 +359,15 @@ const UserPage = () => {
       {createUserModalOpened && !isError ? (
         <ModalCreateUser
           open={createUserModalOpened}
+          previousData={previousFormData}
           closeHandler={() =>
             setMultiState(setPageState, {createUserModalOpened: false})
           }
-          getFormData={async val => modifyUserHandler(val)}
+          getFormData={val => {
+            val.userId
+              ? modifyUserHandler(val, 'mengubah')
+              : modifyUserHandler(val)
+          }}
         />
       ) : null}
     </>
