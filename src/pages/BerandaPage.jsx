@@ -68,10 +68,13 @@ const Beranda = () => {
   ]
   return (
     <>
-      <PlainCard label="Antrian Upload" />
+      <PlainCard label="Antrian Upload Recording BigBlueButton" />
       <InnerLayout>
+        <Card sx={{p: 2}}>
+          <Typography>{`Total Antrian: ${data.length}`}</Typography>
+        </Card>
         {data.map((item, i) => (
-          <Card sx={{my: 2}}>
+          <Card sx={{my: 2}} key={i}>
             <CardContent>
               <Box
                 sx={{
@@ -80,12 +83,12 @@ const Beranda = () => {
                   justifyContent: 'space-between',
                 }}
               >
-                <Typography sx={{fontWeight: 'bold'}}>{`Antrian ke ${
-                  i + 1
-                }`}</Typography>
+                <Typography sx={{fontWeight: 'bold'}}>
+                  Rabu, 12/Oktober/2022 10:10
+                </Typography>
                 <Typography sx={{opacity: '0.8'}}>
                   {item.status == 2
-                    ? 'dalam proses upload ke youtube'
+                    ? 'proses upload ke youtube'
                     : 'dalam antrian'}
                 </Typography>
               </Box>

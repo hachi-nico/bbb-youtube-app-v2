@@ -180,7 +180,7 @@ function MainLayout({children}) {
         >
           <Box sx={{p: 2}}>
             <p className="headerDrawerHeading">
-              Automatic Bigbluebutton Recording Upload System
+              Dashboard Monitoring Recording BigBlueButton
             </p>
           </Box>
           <Divider />
