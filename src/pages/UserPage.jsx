@@ -209,7 +209,7 @@ const UserPage = () => {
   }
 
   const headingList = [
-    {label: 'Aksi'},
+    {label: ' '},
     {label: 'Nama'},
     {label: 'Username'},
     {label: 'Role'},
@@ -260,54 +260,62 @@ const UserPage = () => {
               }
             >
               {data.users.map((item, i) => (
-                <TableRow
-                  onClick={() => collapseHandler(i)}
-                  key={i}
-                  sx={{
-                    '&:last-child td, &:last-child th': {
-                      border: 0,
-                    },
-                    cursor: 'pointer',
-                  }}
-                >
-                  <TableCell>
-                    <IconButton onClick={() => collapseHandler(i)}>
-                      {collapseOpen && i == collapseIndex ? (
-                        <KeyboardArrowUpIcon />
-                      ) : (
-                        <KeyboardArrowDownIcon />
-                      )}
-                    </IconButton>
-                    <Collapse
-                      in={collapseOpen && i == collapseIndex}
-                      timeout="auto"
-                      unmountOnExit
-                    >
-                      <ActionButton
-                        deleteHandler={() =>
-                          modifyUserHandler(data.users[i].user_id, 'menghapus')
-                        }
-                        updateHandler={() => {
-                          setPreviousFormData(data.users[i])
-                          setPageState(s => ({
-                            ...s,
-                            createUserModalOpened: true,
-                          }))
-                        }}
-                      />
-                    </Collapse>
-                  </TableCell>
-                  <TableCell>{`${item.nama ? item.nama : ' - '}`}</TableCell>
-                  <TableCell>{item.username}</TableCell>
-                  <TableCell>{getRoleName(item.tipe)}</TableCell>
-                  <TableCell>
-                    {`${
-                      item.tgl
-                        ? dayjs(item.tgl).format(mainDateTimeFormat)
-                        : '-'
-                    }`}
-                  </TableCell>
-                </TableRow>
+                <>
+                  <TableRow
+                    key={i}
+                    sx={{
+                      '&:last-child td, &:last-child th': {
+                        border: 0,
+                      },
+                      '& td': {border: 0},
+                    }}
+                  >
+                    <TableCell>
+                      <IconButton onClick={() => collapseHandler(i)}>
+                        {collapseOpen && i == collapseIndex ? (
+                          <KeyboardArrowUpIcon />
+                        ) : (
+                          <KeyboardArrowDownIcon />
+                        )}
+                      </IconButton>
+                    </TableCell>
+                    <TableCell>{`${item.nama ? item.nama : ' - '}`}</TableCell>
+                    <TableCell>{item.username}</TableCell>
+                    <TableCell>{getRoleName(item.tipe)}</TableCell>
+                    <TableCell>
+                      {`${
+                        item.tgl
+                          ? dayjs(item.tgl).format(mainDateTimeFormat)
+                          : '-'
+                      }`}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow sx={{'& > *': {borderBottom: 'unset'}}}>
+                    <TableCell sx={{pb: 0, pt: 0}} colspan={5}>
+                      <Collapse
+                        in={collapseOpen && i == collapseIndex}
+                        timeout="auto"
+                        unmountOnExit
+                      >
+                        <ActionButton
+                          deleteHandler={() =>
+                            modifyUserHandler(
+                              data.users[i].user_id,
+                              'menghapus'
+                            )
+                          }
+                          updateHandler={() => {
+                            setPreviousFormData(data.users[i])
+                            setPageState(s => ({
+                              ...s,
+                              createUserModalOpened: true,
+                            }))
+                          }}
+                        />
+                      </Collapse>
+                    </TableCell>
+                  </TableRow>
+                </>
               ))}
             </DataTable>
             {data.users.length > 0 && (

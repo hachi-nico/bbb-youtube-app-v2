@@ -17,52 +17,52 @@ const Beranda = () => {
   const data = [
     {
       id: '9681d5c841a7b6dfec881616a15b203d2937d796-1667381516323',
-      moderator: 'Nico Akbar',
+      meetingID: 'Nico Akbar',
       status: 2,
     },
     {
       id: '9681d5c841a7b6dfec881616a15b203d2937d796-1667381516323',
-      moderator: 'Nico Akbar',
+      meetingID: 'Nico Akbar',
       status: 4,
     },
     {
       id: '9681d5c841a7b6dfec881616a15b203d2937d796-1667381516323',
-      moderator: 'Nico Akbar',
+      meetingID: 'Nico Akbar',
       status: 4,
     },
     {
       id: '9681d5c841a7b6dfec881616a15b203d2937d796-1667381516323',
-      moderator: 'Nico Akbar',
+      meetingID: 'Nico Akbar',
       status: 4,
     },
     {
       id: '9681d5c841a7b6dfec881616a15b203d2937d796-1667381516323',
-      moderator: 'Nico Akbar',
+      meetingID: 'Nico Akbar',
       status: 4,
     },
     {
       id: '9681d5c841a7b6dfec881616a15b203d2937d796-1667381516323',
-      moderator: 'Nico Akbar',
+      meetingID: 'Nico Akbar',
       status: 4,
     },
     {
       id: '9681d5c841a7b6dfec881616a15b203d2937d796-1667381516323',
-      moderator: 'Nico Akbar',
+      meetingID: 'Nico Akbar',
       status: 4,
     },
     {
       id: '9681d5c841a7b6dfec881616a15b203d2937d796-1667381516323',
-      moderator: 'Nico Akbar',
+      meetingID: 'Nico Akbar',
       status: 4,
     },
     {
       id: '9681d5c841a7b6dfec881616a15b203d2937d796-1667381516323',
-      moderator: 'Nico Akbar',
+      meetingID: 'Nico Akbar',
       status: 4,
     },
     {
       id: '9681d5c841a7b6dfec881616a15b203d2937d796-1667381516323',
-      moderator: 'Nico Akbar',
+      meetingID: 'Nico Akbar',
       status: 4,
     },
   ]
@@ -93,7 +93,7 @@ const Beranda = () => {
                 </Typography>
               </Box>
               <Typography>{`Internal Meeting ID ${item.id}`}</Typography>
-              <Typography>{`Moderator ${item.moderator}`}</Typography>
+              <Typography>{`Meeting ID ${item.meetingID}`}</Typography>
               <LinearProgress sx={{mt: 3}} variant="determinate" value={20} />
             </CardContent>
           </Card>

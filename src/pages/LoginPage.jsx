@@ -52,6 +52,7 @@ function LoginPage() {
       if (data.status == 1) {
         pageStateHandler({loading: false}, 'pageState')
         const userData = decodeToken(data.token)
+        console.log(userData)
         localStorage.setItem('token', JSON.stringify(data.token))
         localStorage.setItem('userData', JSON.stringify(userData))
         history.push('/antrian')
@@ -107,7 +108,7 @@ function LoginPage() {
       />
       {loading && <FullScreenLoader />}
       <CardContainer
-        style={{
+        sx={{
           width: {xs: 325, md: 500},
           height: 300,
           position: 'relative',

@@ -12,12 +12,12 @@ const DataTable = ({headingList = [], children, filterComponents = null}) => {
   return (
     <TableContainer component={Paper} sx={{pt: 2}}>
       {filterComponents}
-      <Table sx={{minWidth: 700}} aria-label="simple table">
+      <Table sx={{minWidth: 700}} aria-label="simple table" size="small">
         <TableHead>
           <TableRow>
             {headingList.map((item, i) => {
               return item.sort ? (
-                <TableCell key={i} sx={s.tableHeading}>
+                <TableCell key={i}>
                   <TableSortLabel
                     active={true}
                     direction={item.sortType ? 'asc' : 'desc'}
@@ -27,7 +27,14 @@ const DataTable = ({headingList = [], children, filterComponents = null}) => {
                   </TableSortLabel>
                 </TableCell>
               ) : (
-                <TableCell key={i} sx={s.tableHeading}>
+                <TableCell
+                  key={i}
+                  sx={
+                    i == 0
+                      ? {...s.tableHeading, width: 10}
+                      : {...s.tableHeading}
+                  }
+                >
                   {item.label}
                 </TableCell>
               )
