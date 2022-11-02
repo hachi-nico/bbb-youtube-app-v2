@@ -22,6 +22,7 @@ import MainFloatingButton from '../components/FloatingActionButton'
 import ModalCreateUser from '../components/UserPage/ModalCreateUser'
 import SelectInput from '../components/SelectInput'
 import ActionButton from '../components/ActionButton'
+import InnerLayout from '../layouts/InnerLayout'
 import {getLocalToken, isSessionExp, scrollToTop} from '../utils/globalFunction'
 import {baseUrl} from '../config/api'
 import {mainDateTimeFormat, insertDateTimeFormat} from '../config/globalvar'
@@ -227,7 +228,7 @@ const UserPage = () => {
     <>
       <PlainCard label="Manajemen User" />
       {data && !isError ? (
-        <div style={{marginTop: 26, marginBottom: 20}}>
+        <InnerLayout>
           <>
             <DataTable
               headingList={headingList}
@@ -330,7 +331,7 @@ const UserPage = () => {
               </div>
             )}
           </>
-        </div>
+        </InnerLayout>
       ) : null}
 
       <MainFloatingButton
