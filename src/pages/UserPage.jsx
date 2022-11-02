@@ -193,6 +193,14 @@ const UserPage = () => {
     }))
   }
 
+  const collapseHandler = i => {
+    setPageState(s => ({
+      ...s,
+      collapseIndex: i,
+      collapseOpen: !s.collapseOpen,
+    }))
+  }
+
   if (isLoading || isValidating) {
     return <FullScreenLoader />
   }
@@ -218,15 +226,6 @@ const UserPage = () => {
       <PlainCard label="Manajemen User" />
       {data && !isError ? (
         <div style={{marginTop: 26, marginBottom: 20}}>
-          <Button
-            variant="contained"
-            sx={{backgroundColor: green, mb: 2}}
-            onClick={() =>
-              setMultiState(setPageState, {createUserModalOpened: true})
-            }
-          >
-            Tambah User
-          </Button>
           <>
             <GlobalTable
               headingList={headingList}
@@ -259,19 +258,17 @@ const UserPage = () => {
             >
               {data.users.map((item, i) => (
                 <TableRow
+                  onClick={() => collapseHandler(i)}
                   key={i}
-                  sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                  sx={{
+                    '&:last-child td, &:last-child th': {
+                      border: 0,
+                    },
+                    cursor: 'pointer',
+                  }}
                 >
                   <TableCell>
-                    <IconButton
-                      onClick={() => {
-                        setPageState(s => ({
-                          ...s,
-                          collapseIndex: i,
-                          collapseOpen: !s.collapseOpen,
-                        }))
-                      }}
-                    >
+                    <IconButton onClick={() => collapseHandler(i)}>
                       {collapseOpen && i == collapseIndex ? (
                         <KeyboardArrowUpIcon />
                       ) : (
@@ -353,6 +350,9 @@ const UserPage = () => {
         refreshPage={() => {
           resetPageState()
           mutateUser()
+        }}
+        addData={() => {
+          setMultiState(setPageState, {createUserModalOpened: true})
         }}
       />
 
