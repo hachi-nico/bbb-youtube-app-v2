@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react'
+import React, {useEffect, useState, useRef, Fragment} from 'react'
 import axios from 'axios'
 import {useHistory} from 'react-router-dom'
 import dayjs from 'dayjs'
@@ -260,9 +260,8 @@ const UserPage = () => {
               }
             >
               {data.users.map((item, i) => (
-                <>
+                <Fragment key={i}>
                   <TableRow
-                    key={i}
                     sx={{
                       '&:last-child td, &:last-child th': {
                         border: 0,
@@ -291,7 +290,7 @@ const UserPage = () => {
                     </TableCell>
                   </TableRow>
                   <TableRow sx={{'& > *': {borderBottom: 'unset'}}}>
-                    <TableCell sx={{pb: 0, pt: 0}} colspan={5}>
+                    <TableCell sx={{pb: 0, pt: 0}} colSpan={5}>
                       <Collapse
                         in={collapseOpen && i == collapseIndex}
                         timeout="auto"
@@ -315,7 +314,7 @@ const UserPage = () => {
                       </Collapse>
                     </TableCell>
                   </TableRow>
-                </>
+                </Fragment>
               ))}
             </DataTable>
             {data.users.length > 0 && (

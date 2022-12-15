@@ -52,7 +52,6 @@ function LoginPage() {
       if (data.status == 1) {
         pageStateHandler({loading: false}, 'pageState')
         const userData = decodeToken(data.token)
-        console.log(userData)
         localStorage.setItem('token', JSON.stringify(data.token))
         localStorage.setItem('userData', JSON.stringify(userData))
         history.push('/antrian')
