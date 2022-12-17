@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/id'
 import useSWR from 'swr'
 import axios from 'axios'
+import {io} from 'socket.io-client'
 
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
@@ -20,6 +21,9 @@ import FetchMoreButton from '../components/FetchMoreButton'
 import {getLocalToken, isSessionExp, scrollToTop} from '../utils/globalFunction'
 import {mainDateTimeFormat} from '../config/globalvar'
 import {baseUrl} from '../config/api'
+import {green, blue, yellow, grey, red} from '../config/color'
+
+const socket = io(baseUrl)
 
 const Beranda = () => {
   dayjs.locale('id')
@@ -27,13 +31,28 @@ const Beranda = () => {
   const firstRender = useRef(true)
   const [noMoreDataLabel, setNoMoreDataLabel] = useState(false)
   const [fetchMoreLoad, setFetchMoreLoad] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [connect, setConnect] = useState(socket.connected)
 
   useEffect(() => {
     if (firstRender.current) {
       firstRender.current = false
       document.title = 'Manajemen User'
     }
+
+    socket.on('status', status => {
+      setConnect(status)
+    })
+
+    socket.on('uploadProgress', val => {
+      setProgress(val)
+    })
+
     mutateAntrian()
+    return () => {
+      socket.off('status')
+      socket.off('uploadProgress')
+    }
   }, [])
 
   const fetchApi = async args => {
@@ -117,6 +136,9 @@ const Beranda = () => {
       {data && !isError ? (
         <InnerLayout>
           <Card sx={{p: 2}}>
+            <Typography color={connect ? green : red}>{`Status Data Realtime: ${
+              connect ? 'Terhubung' : 'Tidak Terhubung'
+            }`}</Typography>
             <Typography>{`Total Antrian: ${data.count}`}</Typography>
           </Card>
           {data.antrian.map((item, i) => (
@@ -132,7 +154,7 @@ const Beranda = () => {
                   <Typography sx={{fontWeight: 'bold'}}>
                     {dayjs(item.tgl_upload).format(mainDateTimeFormat)}
                   </Typography>
-                  <Typography sx={{opacity: '0.8'}}>
+                  <Typography color={item.status == 2 ? blue : grey}>
                     {item.status == 2
                       ? 'proses upload ke youtube'
                       : 'dalam antrian'}
@@ -140,7 +162,13 @@ const Beranda = () => {
                 </Box>
                 <Typography>{`Internal Meeting ID ${item.judul}`}</Typography>
                 <Typography>{`Meeting ID ${item.deskripsi}`}</Typography>
-                <LinearProgress sx={{mt: 3}} variant="determinate" value={20} />
+                {item.status != 2 ? (
+                  <LinearProgress
+                    sx={{mt: 3}}
+                    variant={progress > 0 ? 'determinate' : 'indeterminate'}
+                    value={progress}
+                  />
+                ) : null}
               </CardContent>
             </Card>
           ))}

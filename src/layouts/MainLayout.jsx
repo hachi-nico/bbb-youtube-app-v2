@@ -117,7 +117,7 @@ function MainLayout({children}) {
                   ...isActiveBgColor,
                   '&:hover': {
                     backgroundColor:
-                      navValue == item.label ? indigo : 'rgba(0,0,0,0.05)',
+                      pathname == item.route ? indigo : 'rgba(0,0,0,0.05)',
                   },
                 }}
               >

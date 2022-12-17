@@ -8,7 +8,7 @@ function FullScreenLoader() {
     <div
       style={{
         ...floatingStyle,
-        zIndex: 10,
+        zIndex: 1000,
         backgroundColor: 'rgba(255,255,255,0.6)',
         alignItems: 'center',
         justifyContent: 'center',
