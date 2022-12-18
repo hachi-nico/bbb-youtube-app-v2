@@ -354,12 +354,12 @@ const UserPage = () => {
 
       <FullPageWarning
         label={
-          (!data || !data.length > 0) && !isLoading && !isError
+          (!data || data.length <= 0) && !isLoading && !isError
             ? 'Tidak ada data'
             : 'Gagal saat memuat data user, silakan coba kembali !!!'
         }
         displayed={
-          isError || ((!data || !data.length > 0) && !isLoading && !isError)
+          isError || ((!data || data.length <= 0) && !isLoading && !isError)
         }
       />
 
@@ -374,10 +374,12 @@ const UserPage = () => {
         <ModalCreateUser
           open={createUserModalOpened}
           previousData={previousFormData}
-          closeHandler={() =>
+          closeHandler={() => {
+            setPreviousFormData('')
             setMultiState(setPageState, {createUserModalOpened: false})
-          }
+          }}
           getFormData={val => {
+            setPreviousFormData('')
             val.userId
               ? modifyUserHandler(val, 'mengubah')
               : modifyUserHandler(val)

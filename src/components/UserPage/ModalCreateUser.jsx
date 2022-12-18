@@ -41,7 +41,7 @@ function ModalCreateUser({
   } = form
 
   useEffect(() => {
-    if (previousData)
+    if (previousData?.user_id)
       setForm(s => ({...s, ...previousData, role: previousData.tipe}))
   }, [])
 
@@ -60,16 +60,14 @@ function ModalCreateUser({
       return false
     }
 
-    if (!previousData) {
-      if (!password) {
-        setForm(s => ({...s, passwordErr: true}))
-        return false
-      }
+    if (!password) {
+      setForm(s => ({...s, passwordErr: true}))
+      return false
+    }
 
-      if (password != passwordRepeat) {
-        setForm(s => ({...s, passwordRepeatErr: true}))
-        return false
-      }
+    if (password != passwordRepeat) {
+      setForm(s => ({...s, passwordRepeatErr: true}))
+      return false
     }
 
     const regExp = /[-!$%^&*()_+|~=`{}\[\]:\/;<>?,.@#]/
@@ -87,17 +85,12 @@ function ModalCreateUser({
       password,
       nama,
       tipe: role,
-      userId: previousData ? previousData.user_id : '',
+      userId: previousData?.user_id ?? '',
     })
   }
 
   return (
-    <Dialog
-      open={open}
-      fullWidth
-      onClose={closeHandler}
-      sx={{m: {md: 12, xs: 4}}}
-    >
+    <Dialog fullScreen open={open} onClose={closeHandler}>
       <DialogTitle sx={{textAlign: 'center'}}>Tambah Data Baru</DialogTitle>
       <DialogContent sx={{pb: 1}}>
         <Box
@@ -143,7 +136,7 @@ function ModalCreateUser({
             autoComplete: 'new-password',
           }}
         />
-        {!previousData ? (
+        {previousData?.user_id ? null : (
           <>
             <TextField
               error={passwordErr}
@@ -170,12 +163,12 @@ function ModalCreateUser({
               fullWidth
             />
           </>
-        ) : null}
+        )}
       </DialogContent>
       <DialogActions>
         <div style={{display: 'flex'}}>
           <Button variant="contained" onClick={closeHandler} sx={{mr: 2}}>
-            Cancel
+            Batal
           </Button>
           <Button variant="contained" onClick={submitHandler}>
             Simpan
