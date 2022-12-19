@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import {
   Switch,
   Route,
@@ -13,8 +13,34 @@ import LaporanPage from './pages/LaporanPage'
 import UploadPage from './pages/UploadPage'
 import UserPage from './pages/UserPage'
 import LoginPage from './pages/LoginPage'
+import {baseUrl} from './config/api'
 
 export default function App() {
+  useEffect(() => {
+    async function registerServiceWorker() {
+      try {
+        const register = await navigator.serviceWorker.register('./worker.js', {
+          scope: '/',
+        })
+        const subscription = await register.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: import.meta.env.VITE_APP_PUBLIC_VAPID_KEY,
+        })
+
+        await fetch(baseUrl + 'notification-subscribe', {
+          method: 'POST',
+          body: JSON.stringify(subscription),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      } catch (e) {
+        console.log('gagal service worker', e)
+      }
+    }
+    registerServiceWorker()
+  }, [])
+
   const {pathname} = useLocation()
   if (pathname == '/') return useHistory().push('/antrian')
   return (
