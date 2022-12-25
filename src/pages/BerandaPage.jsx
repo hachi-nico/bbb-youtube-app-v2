@@ -209,14 +209,8 @@ const Beranda = () => {
       />
 
       <FullPageWarning
-        label={
-          (!data || data.length <= 0) && !isLoading && !isError
-            ? 'Tidak ada data'
-            : 'Gagal saat memuat data user, silakan coba kembali !!!'
-        }
-        displayed={
-          isError || ((!data || data.length <= 0) && !isLoading && !isError)
-        }
+        label={'Gagal saat memuat data antrian, silakan coba kembali !!!'}
+        displayed={isError}
       />
     </>
   )

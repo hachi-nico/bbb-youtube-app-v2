@@ -8,11 +8,16 @@ import TableRow from '@mui/material/TableRow'
 import TableSortLabel from '@mui/material/TableSortLabel'
 import Paper from '@mui/material/Paper'
 
-const DataTable = ({headingList = [], children, filterComponents = null}) => {
+const DataTable = ({
+  headingList = [],
+  children,
+  filterComponents = null,
+  size = 'small',
+}) => {
   return (
     <TableContainer component={Paper} sx={{pt: 2}}>
       {filterComponents}
-      <Table sx={{minWidth: 700}} aria-label="simple table" size="small">
+      <Table sx={{minWidth: 700}} aria-label="simple table" size={size}>
         <TableHead>
           <TableRow>
             {headingList.map((item, i) => {

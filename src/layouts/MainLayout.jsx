@@ -22,6 +22,7 @@ import BackupIcon from '@mui/icons-material/Backup'
 import GroupIcon from '@mui/icons-material/Group'
 import LogoutIcon from '@mui/icons-material/Logout'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
+import SubscriptionsIcon from '@mui/icons-material/Subscriptions'
 
 import BottomNavigation from '@mui/material/BottomNavigation'
 import BottomNavigationAction from '@mui/material/BottomNavigationAction'
@@ -50,7 +51,7 @@ function MainLayout({children}) {
     },
     {
       label: 'Video',
-      icon: <ArticleIcon />,
+      icon: <SubscriptionsIcon />,
       route: '/video',
     },
     {

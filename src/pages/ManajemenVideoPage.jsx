@@ -33,13 +33,13 @@ const ManajemenVideoPage = () => {
   const history = useHistory()
   const firstRender = useRef(true)
   const [searchInput, setSearchInput] = useState('')
-
-  const [fetchMoreLoad, setFetchMoreLoad] = useState(false)
-  const [noMoreDataLabel, setNoMoreDataLabel] = useState(false)
-  const [search, setSearch] = useState('')
-  const [previousFormData, setPreviousFormData] = useState('')
   const [collapseOpen, setCollapseOpen] = useState(false)
   const [collapseIndex, setCollapseIndex] = useState('')
+  const [previousFormData, setPreviousFormData] = useState('')
+  const [noMoreDataLabel, setNoMoreDataLabel] = useState(false)
+  const [fetchMoreLoad, setFetchMoreLoad] = useState(false)
+
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     if (firstRender.current) {
