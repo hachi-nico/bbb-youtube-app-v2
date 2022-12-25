@@ -151,17 +151,27 @@ const LaporanPage = () => {
     return label
   }
 
+  const handleStatusColor = data => {
+    let color = ''
+    statusList.map(item => {
+      if (item.value == data) {
+        color = item.color
+      }
+    })
+    return color
+  }
+
   const headingList = [
     {label: 'No.'},
     {label: 'Judul'},
-    {label: 'Role'},
+    {label: 'Status'},
     {
-      label: 'Tanggal Dibuat',
+      label: 'Tanggal Diupload',
       sort: true,
       sortType: tglSort,
       handler: () => {
-        mutateUser()
         setTglSort(s => !s)
+        mutateLaporanUpload()
       },
     },
   ]
@@ -211,7 +221,9 @@ const LaporanPage = () => {
                   >
                     <TableCell>{i + 1}</TableCell>
                     <TableCell>{item.judul}</TableCell>
-                    <TableCell>{handleStatus(item.status)}</TableCell>
+                    <TableCell sx={{color: handleStatusColor(item.status)}}>
+                      {handleStatus(item.status)}
+                    </TableCell>
                     <TableCell>
                       {dayjs(item.tgl_upload).format(mainDateTimeFormat)}
                     </TableCell>
