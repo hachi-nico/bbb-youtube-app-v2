@@ -36,9 +36,21 @@ const drawerWidth = 240
 
 function MainLayout({children}) {
   const token = JSON.parse(localStorage.getItem('token'))
+  const isSuperAdmin = JSON.parse(localStorage.getItem('userData'))
   if (!token) return children
 
-  const adminMenuList = [
+  const adminMenuList =
+    isSuperAdmin.tipe == 1
+      ? [
+          {
+            label: 'User',
+            icon: <GroupIcon />,
+            route: '/user',
+          },
+        ]
+      : []
+
+  const userMenuList = [
     {
       label: 'Antrian',
       icon: <LayersIcon />,
@@ -59,11 +71,7 @@ function MainLayout({children}) {
       icon: <BackupIcon />,
       route: '/upload',
     },
-    {
-      label: 'User',
-      icon: <GroupIcon />,
-      route: '/user',
-    },
+    ...adminMenuList,
     {
       label: 'Keluar',
       icon: <LogoutIcon />,
@@ -102,7 +110,7 @@ function MainLayout({children}) {
 
   const desktopDrawerItem = (
     <List sx={{mt: 2}}>
-      {adminMenuList.map((item, index) => {
+      {userMenuList.map((item, index) => {
         const isActiveColor =
           pathname == item.route ? {color: '#fff'} : {color: '#000'}
         const isActiveBgColor =
@@ -234,7 +242,7 @@ function MainLayout({children}) {
         }}
         value={navValue}
       >
-        {adminMenuList.map((item, i) => (
+        {userMenuList.map((item, i) => (
           <BottomNavigationAction
             LinkComponent={RouterLink}
             to={item.route}

@@ -59,6 +59,7 @@ const UserPage = () => {
     collapseOpen,
     collapseIndex,
   } = pageState
+  const isSuperAdmin = JSON.parse(localStorage.getItem('userData'))
 
   const history = useHistory()
   const firstRender = useRef(true)
@@ -113,6 +114,15 @@ const UserPage = () => {
     }
   }
   const {data, isError, isLoading, isValidating, mutateUser} = useUsers()
+
+  if (isSuperAdmin.tipe != 1) {
+    return (
+      <FullPageWarning
+        displayed={true}
+        label={'Anda tidak punya akses di halaman ini'}
+      />
+    )
+  }
 
   const setMultiState = (setStateName, obj) => {
     setStateName(s => ({
