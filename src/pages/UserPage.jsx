@@ -100,6 +100,7 @@ const UserPage = () => {
         revalidateOnFocus: false,
       }
     )
+
     return {
       data,
       isLoading: !error && !data,
@@ -109,6 +110,7 @@ const UserPage = () => {
     }
   }
   const {data, isError, isLoading, isValidating, mutateUser} = useUsers()
+
   const setMultiState = (setStateName, obj) => {
     setStateName(s => ({
       ...s,
@@ -211,6 +213,7 @@ const UserPage = () => {
 
   const headingList = [
     {label: ' '},
+    {label: 'No.'},
     {label: 'Nama'},
     {label: 'Username'},
     {label: 'Role'},
@@ -281,6 +284,7 @@ const UserPage = () => {
                         )}
                       </IconButton>
                     </TableCell>
+                    <TableCell>{i + 1}</TableCell>
                     <TableCell>{`${item.nama ? item.nama : ' - '}`}</TableCell>
                     <TableCell>{item.username}</TableCell>
                     <TableCell>{getRoleName(item.tipe)}</TableCell>
@@ -293,7 +297,7 @@ const UserPage = () => {
                     </TableCell>
                   </TableRow>
                   <TableRow sx={{'& > *': {borderBottom: 'unset'}}}>
-                    <TableCell sx={{pb: 0, pt: 0}} colSpan={5}>
+                    <TableCell sx={{pb: 0, pt: 0}} colSpan={headingList.length}>
                       <Collapse
                         in={collapseOpen && i == collapseIndex}
                         timeout="auto"
@@ -382,6 +386,7 @@ const UserPage = () => {
             setMultiState(setPageState, {createUserModalOpened: false})
           }}
           getFormData={val => {
+            setMultiState(setPageState, {createUserModalOpened: false})
             setPreviousFormData('')
             val.userId
               ? modifyUserHandler(val, 'mengubah')

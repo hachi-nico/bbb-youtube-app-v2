@@ -49,6 +49,11 @@ function MainLayout({children}) {
       route: '/laporan',
     },
     {
+      label: 'Video',
+      icon: <ArticleIcon />,
+      route: '/video',
+    },
+    {
       label: 'Upload',
       icon: <BackupIcon />,
       route: '/upload',

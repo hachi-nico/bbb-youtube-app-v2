@@ -13,6 +13,7 @@ import LaporanPage from './pages/LaporanPage'
 import UploadPage from './pages/UploadPage'
 import UserPage from './pages/UserPage'
 import LoginPage from './pages/LoginPage'
+import ManajemenVideoPage from './pages/ManajemenVideoPage'
 import {baseUrl} from './config/api'
 
 export default function App() {
@@ -60,6 +61,9 @@ export default function App() {
         </PrivateRoute>
         <PrivateRoute path="/user">
           <UserPage />
+        </PrivateRoute>
+        <PrivateRoute path="/video">
+          <ManajemenVideoPage />
         </PrivateRoute>
       </MainLayout>
     </Switch>

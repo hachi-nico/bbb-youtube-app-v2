@@ -25,15 +25,18 @@ import SwitchButton from '../components/Switch'
 
 const Beranda = () => {
   dayjs.locale('id')
+  const autoRefreshSetting = JSON.parse(
+    localStorage.getItem('autoRefreshSetting')
+  )
   const history = useHistory()
   const firstRender = useRef(true)
   const [noMoreDataLabel, setNoMoreDataLabel] = useState(false)
   const [fetchMoreLoad, setFetchMoreLoad] = useState(false)
-  const [checked, setChecked] = useState(false)
+  const [checked, setChecked] = useState(autoRefreshSetting?.setting ?? false)
   useEffect(() => {
     if (firstRender.current) {
       firstRender.current = false
-      document.title = 'Manajemen User'
+      document.title = 'Antrian'
     }
 
     mutateAntrian()
@@ -88,9 +91,10 @@ const Beranda = () => {
         refreshInterval: checked ? 5000 : false,
       }
     )
-    const formattedData = formatData(data)
+
+    const formattedData = formatData(data?.antrian)
     return {
-      formattedData,
+      data: {count: data?.count, antrian: formattedData},
       isLoading: !error && !data,
       isError: error,
       isValidating,
@@ -110,8 +114,13 @@ const Beranda = () => {
         })
 
         if (nextData.antrian.length <= 0) setNoMoreDataLabel(true)
+        const formattedData = formatData([
+          ...prevData.antrian,
+          ...nextData.antrian,
+        ])
         return {
-          antrian: [...prevData.antrian, ...nextData.antrian],
+          status: nextData.status,
+          antrian: formattedData,
           count: nextData.count,
         }
       },
@@ -132,7 +141,13 @@ const Beranda = () => {
             <SwitchButton
               label="Refresh Otomatis"
               checked={checked}
-              onChange={() => setChecked(s => !s)}
+              onChange={() => {
+                localStorage.setItem(
+                  'autoRefreshSetting',
+                  JSON.stringify({setting: !checked})
+                )
+                setChecked(s => !s)
+              }}
             />
             <Typography>{`Total Antrian: ${data.count}`}</Typography>
           </Card>
@@ -195,12 +210,12 @@ const Beranda = () => {
 
       <FullPageWarning
         label={
-          (!data || !data.length > 0) && !isLoading && !isError
+          (!data || data.length <= 0) && !isLoading && !isError
             ? 'Tidak ada data'
             : 'Gagal saat memuat data user, silakan coba kembali !!!'
         }
         displayed={
-          isError || ((!data || !data.length > 0) && !isLoading && !isError)
+          isError || ((!data || data.length <= 0) && !isLoading && !isError)
         }
       />
     </>

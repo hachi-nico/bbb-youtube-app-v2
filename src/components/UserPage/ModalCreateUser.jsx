@@ -60,12 +60,12 @@ function ModalCreateUser({
       return false
     }
 
-    if (!password) {
+    if (!password && !previousData) {
       setForm(s => ({...s, passwordErr: true}))
       return false
     }
 
-    if (password != passwordRepeat) {
+    if (password != passwordRepeat && !previousData) {
       setForm(s => ({...s, passwordRepeatErr: true}))
       return false
     }
@@ -166,7 +166,7 @@ function ModalCreateUser({
         )}
       </DialogContent>
       <DialogActions>
-        <div style={{display: 'flex'}}>
+        <div style={{display: 'flex', marginBottom: 10}}>
           <Button variant="contained" onClick={closeHandler} sx={{mr: 2}}>
             Batal
           </Button>
