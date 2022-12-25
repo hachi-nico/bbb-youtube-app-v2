@@ -3,12 +3,12 @@ import CircularProgress from '@mui/material/CircularProgress'
 
 import {floatingStyle} from '../config/globalStyles'
 
-function FullScreenLoader() {
+function FullScreenLoader({caption}) {
   return (
     <div
       style={{
         ...floatingStyle,
-        zIndex: 1000,
+        zIndex: 100000,
         backgroundColor: 'rgba(255,255,255,0.6)',
         alignItems: 'center',
         justifyContent: 'center',
@@ -16,6 +16,7 @@ function FullScreenLoader() {
       }}
     >
       <CircularProgress thickness={5} size={60} />
+      {caption ? <p style={{marginLeft: 20}}>{caption}</p> : null}
     </div>
   )
 }
