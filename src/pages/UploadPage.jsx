@@ -13,6 +13,7 @@ import CardContainer from '../components/CardContainer'
 import {getLocalToken} from '../utils/globalFunction'
 import Alert from '../components/Alert'
 import FullScreenLoader from '../components/FullScreenLoader'
+import FullPageWarning from '../components/FullPageWarning'
 
 const UploadPage = () => {
   const history = useHistory()
@@ -85,71 +86,78 @@ const UploadPage = () => {
 
   return (
     <>
-      <PlainCard label="Form Upload Manual" />
-      <InnerLayout>
-        <CardContainer>
-          <TextField
-            value={judul}
-            label="Judul"
-            variant="outlined"
-            onChange={e => setJudul(e.target.value)}
-            fullWidth
-            inputProps={{
-              autoComplete: 'new-password',
-            }}
-            sx={{mb: 2}}
-          />
-          <TextField
-            value={deskripsi}
-            label="Deskripsi"
-            variant="outlined"
-            onChange={e => setDeskripsi(e.target.value)}
-            fullWidth
-            inputProps={{
-              autoComplete: 'new-password',
-            }}
-            sx={{mb: 2}}
-          />
-
-          <Box
-            sx={{
-              mb: 2,
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}
-          >
-            <Button variant="outlined" component="label">
-              Pilih File
-              <input
-                hidden
-                multiple
-                type="file"
-                onChange={e => {
-                  setFileLabel(
-                    e.target.value.substring(12, e.target.value.length)
-                  )
-                  setFile(e.target.files[0])
-                }}
-              />
-            </Button>
-            <Typography sx={{ml: 2}}>{fileLabel ?? '-'}</Typography>
-          </Box>
-
-          <Box sx={{display: 'flex', flexDirection: 'column'}}>
-            <Button variant="contained" onClick={handleSubmit}>
-              Simpan
-            </Button>
-          </Box>
-        </CardContainer>
-      </InnerLayout>
-
-      <Alert
-        label="Terjadi kesalahan saat upload file Silakan coba kembali !!!"
-        opened={alertOpen}
-        onClose={() => setAlertOpen(false)}
-        promptDialog
+      <FullPageWarning
+        sx={{display: {lg: 'none', md: 'block', sm: 'block', xs: 'block'}}}
+        displayed={true}
+        label="Halaman ini hanya tersedia di mode desktop"
       />
+      <Box sx={{display: {lg: 'block', md: 'none', sm: 'none', xs: 'none'}}}>
+        <PlainCard label="Form Upload Manual" />
+        <InnerLayout>
+          <CardContainer>
+            <TextField
+              value={judul}
+              label="Judul"
+              variant="outlined"
+              onChange={e => setJudul(e.target.value)}
+              fullWidth
+              inputProps={{
+                autoComplete: 'new-password',
+              }}
+              sx={{mb: 2}}
+            />
+            <TextField
+              value={deskripsi}
+              label="Deskripsi"
+              variant="outlined"
+              onChange={e => setDeskripsi(e.target.value)}
+              fullWidth
+              inputProps={{
+                autoComplete: 'new-password',
+              }}
+              sx={{mb: 2}}
+            />
+
+            <Box
+              sx={{
+                mb: 2,
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+            >
+              <Button variant="outlined" component="label">
+                Pilih File
+                <input
+                  hidden
+                  multiple
+                  type="file"
+                  onChange={e => {
+                    setFileLabel(
+                      e.target.value.substring(12, e.target.value.length)
+                    )
+                    setFile(e.target.files[0])
+                  }}
+                />
+              </Button>
+              <Typography sx={{ml: 2}}>{fileLabel ?? '-'}</Typography>
+            </Box>
+
+            <Box sx={{display: 'flex', flexDirection: 'column'}}>
+              <Button variant="contained" onClick={handleSubmit}>
+                Simpan
+              </Button>
+            </Box>
+          </CardContainer>
+        </InnerLayout>
+
+        <Alert
+          label="Terjadi kesalahan saat upload file Silakan coba kembali !!!"
+          opened={alertOpen}
+          onClose={() => setAlertOpen(false)}
+          promptDialog
+        />
+      </Box>
     </>
   )
 }
