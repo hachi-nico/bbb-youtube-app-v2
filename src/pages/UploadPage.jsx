@@ -24,7 +24,6 @@ const UploadPage = () => {
 
   const [fileLabel, setFileLabel] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(false)
   const [alertOpen, setAlertOpen] = useState(false)
 
   useEffect(() => {
