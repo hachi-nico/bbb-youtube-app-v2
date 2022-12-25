@@ -10,9 +10,6 @@ import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import LinearProgress from '@mui/material/LinearProgress'
 import Box from '@mui/material/Box'
-import FormGroup from '@mui/material/FormGroup'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Switch from '@mui/material/Switch'
 
 import PlainCard from '../components/PlainCard'
 import InnerLayout from '../layouts/InnerLayout'
@@ -24,6 +21,7 @@ import {getLocalToken, isSessionExp, scrollToTop} from '../utils/globalFunction'
 import {mainDateTimeFormat} from '../config/globalvar'
 import {baseUrl} from '../config/api'
 import {green, blue, yellow, grey, red} from '../config/color'
+import SwitchButton from '../components/Switch'
 
 const Beranda = () => {
   dayjs.locale('id')
@@ -131,17 +129,11 @@ const Beranda = () => {
       {data && !isError ? (
         <InnerLayout>
           <Card sx={{p: 2}}>
-            <FormGroup>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={checked}
-                    onChange={() => setChecked(s => !s)}
-                  />
-                }
-                label="Refresh Otomatis"
-              />
-            </FormGroup>
+            <SwitchButton
+              label="Refresh Otomatis"
+              checked={checked}
+              onChange={() => setChecked(s => !s)}
+            />
             <Typography>{`Total Antrian: ${data.count}`}</Typography>
           </Card>
           {data.antrian.map((item, i) => (

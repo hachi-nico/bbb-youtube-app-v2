@@ -31,6 +31,7 @@ import {IconButton} from '@mui/material'
 const UserPage = () => {
   dayjs.locale('id')
   const [previousFormData, setPreviousFormData] = useState('')
+  const [searchInput, setSearchInput] = useState('')
   const [pageState, setPageState] = useState({
     noMoreDataLabel: false,
     createUserModalOpened: false,
@@ -238,6 +239,8 @@ const UserPage = () => {
                     size="small"
                     placeholder="Cari berdasarkan Nama / Username"
                     variant="outlined"
+                    value={searchInput}
+                    onChange={e => setSearchInput(e.target.value)}
                     onKeyDown={val => searchHandler(val)}
                     sx={{pb: 1, px: 1.5}}
                     fullWidth
