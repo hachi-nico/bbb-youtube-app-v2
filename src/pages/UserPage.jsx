@@ -30,6 +30,8 @@ import {IconButton} from '@mui/material'
 
 const UserPage = () => {
   dayjs.locale('id')
+  const [deleteAlert, setDeleteAlert] = useState(false)
+  const [deleteAlertLabel, setDeleteAlertLabel] = useState('')
   const [previousFormData, setPreviousFormData] = useState('')
   const [searchInput, setSearchInput] = useState('')
   const [pageState, setPageState] = useState({
@@ -67,6 +69,7 @@ const UserPage = () => {
     }
     mutateUser()
   }, [])
+
   const fetchApi = async args => {
     try {
       const {data} = await axios.post(baseUrl + args.url, args.args, {
@@ -146,7 +149,11 @@ const UserPage = () => {
   }
 
   const resetPageState = () => {
+    setDeleteAlert('')
+    setSearchInput('')
     setMultiState(setPageState, {
+      collapseOpen: false,
+      collapseIndex: '',
       noMoreDataLabel: false,
       tglSort: false,
       roleSort: '',
@@ -156,9 +163,8 @@ const UserPage = () => {
   }
 
   const searchHandler = event => {
-    if (event.keyCode == 13) {
+    if (event.keyCode == 13)
       setMultiState(setPageState, {search: event.target.value})
-    }
   }
 
   const selectHandler = event => {
@@ -196,6 +202,7 @@ const UserPage = () => {
   }
 
   const closeAlertHandler = () => {
+    setDeleteAlert('')
     setPageState(s => ({
       ...s,
       alertLabel: '',
@@ -209,6 +216,10 @@ const UserPage = () => {
       collapseIndex: i,
       collapseOpen: !s.collapseOpen,
     }))
+  }
+
+  const deleteHandler = () => {
+    modifyUserHandler(deleteAlert.user_id, 'menghapus')
   }
 
   const headingList = [
@@ -304,12 +315,12 @@ const UserPage = () => {
                         unmountOnExit
                       >
                         <ActionButton
-                          deleteHandler={() =>
-                            modifyUserHandler(
-                              data.users[i].user_id,
-                              'menghapus'
+                          deleteHandler={() => {
+                            setDeleteAlertLabel(
+                              'Konfimasi untuk menghapus data user ' + item.nama
                             )
-                          }
+                            setDeleteAlert(data.users[i])
+                          }}
                           updateHandler={() => {
                             setPreviousFormData(data.users[i])
                             setPageState(s => ({
@@ -375,6 +386,13 @@ const UserPage = () => {
         opened={alertOpen}
         onClose={closeAlertHandler}
         promptDialog
+      />
+      <Alert
+        label={deleteAlertLabel}
+        opened={!!deleteAlert}
+        onClose={closeAlertHandler}
+        onConfirm={deleteHandler}
+        confirmDialog
       />
 
       {createUserModalOpened && !isError ? (

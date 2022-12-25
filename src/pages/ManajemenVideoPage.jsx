@@ -34,7 +34,6 @@ const ManajemenVideoPage = () => {
   const firstRender = useRef(true)
   const [searchInput, setSearchInput] = useState('')
 
-  const [checked, setChecked] = useState(false)
   const [fetchMoreLoad, setFetchMoreLoad] = useState(false)
   const [noMoreDataLabel, setNoMoreDataLabel] = useState(false)
   const [search, setSearch] = useState('')
@@ -125,11 +124,17 @@ const ManajemenVideoPage = () => {
 
   const resetState = () => {
     setNoMoreDataLabel(false)
+    setSearch('')
+    setSearchInput('')
   }
 
   const collapseHandler = i => {
     setCollapseIndex(i)
     setCollapseOpen(s => !s)
+  }
+
+  const searchHandler = event => {
+    if (event.keyCode == 13) setSearch(event.target.value)
   }
 
   const headingList = [
@@ -146,7 +151,26 @@ const ManajemenVideoPage = () => {
       {data && !isError ? (
         <InnerLayout>
           <>
-            <DataTable headingList={headingList}>
+            <DataTable
+              headingList={headingList}
+              filterComponents={
+                <div style={{display: 'flex', flexDirection: 'row'}}>
+                  <TextField
+                    size="small"
+                    placeholder="Cari berdasarkan Judul Video"
+                    variant="outlined"
+                    value={searchInput}
+                    onChange={e => setSearchInput(e.target.value)}
+                    onKeyDown={val => searchHandler(val)}
+                    sx={{pb: 1, px: 1.5}}
+                    fullWidth
+                    inputProps={{
+                      autoComplete: 'new-password',
+                    }}
+                  />
+                </div>
+              }
+            >
               {data.data.map((item, i) => (
                 <Fragment key={i}>
                   <TableRow
@@ -210,6 +234,14 @@ const ManajemenVideoPage = () => {
           </>
         </InnerLayout>
       ) : null}
+
+      <MainFloatingButton
+        scrollToTop={scrollToTop}
+        refreshPage={() => {
+          resetState()
+          mutateManajemenVideo()
+        }}
+      />
     </>
   )
 }
