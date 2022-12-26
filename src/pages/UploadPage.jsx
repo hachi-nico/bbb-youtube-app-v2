@@ -10,7 +10,7 @@ import PlainCard from '../components/PlainCard'
 import {baseUrl} from '../config/api'
 import InnerLayout from '../layouts/InnerLayout'
 import CardContainer from '../components/CardContainer'
-import {getLocalToken} from '../utils/globalFunction'
+import {getLocalToken, isSessionExp} from '../utils/globalFunction'
 import Alert from '../components/Alert'
 import FullScreenLoader from '../components/FullScreenLoader'
 import FullPageWarning from '../components/FullPageWarning'
@@ -49,7 +49,7 @@ const UploadPage = () => {
           history.push('/login')
         }
       } catch (e) {
-        isSessionExp(e?.response.data.status, history)
+        isSessionExp(e?.response?.data?.status, history)
       }
     }
     init()
