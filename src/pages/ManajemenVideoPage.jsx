@@ -11,15 +11,17 @@ import TextField from '@mui/material/TextField'
 import Collapse from '@mui/material/Collapse'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
+import Typography from '@mui/material/Typography'
 
 import Alert from '../components/Alert'
+import CardContainer from '../components/CardContainer'
 import DataTable from '../components/DataTable'
 import PlainCard from '../components/PlainCard'
 import FullPageWarning from '../components/FullPageWarning'
 import FullScreenLoader from '../components/FullScreenLoader'
 import FetchMoreButton from '../components/FetchMoreButton'
 import MainFloatingButton from '../components/FloatingActionButton'
-import ModalCreateUser from '../components/UserPage/ModalCreateUser'
+import ModalUpdateVideo from '../components/ManajemenVideoPage/ModalUpdateVideo'
 import SelectInput from '../components/SelectInput'
 import ActionButton from '../components/ActionButton'
 import InnerLayout from '../layouts/InnerLayout'
@@ -35,9 +37,11 @@ const ManajemenVideoPage = () => {
   const [searchInput, setSearchInput] = useState('')
   const [collapseOpen, setCollapseOpen] = useState(false)
   const [collapseIndex, setCollapseIndex] = useState('')
-  const [previousFormData, setPreviousFormData] = useState('')
   const [noMoreDataLabel, setNoMoreDataLabel] = useState(false)
   const [fetchMoreLoad, setFetchMoreLoad] = useState(false)
+  const [alertOpen, setAlertOpen] = useState(false)
+  const [modalUpdateOpen, setModalUpdateOpen] = useState(false)
+  const [previousData, setPreviousData] = useState({judul: '', deskripsi: ''})
 
   const [search, setSearch] = useState('')
 
@@ -137,6 +141,19 @@ const ManajemenVideoPage = () => {
     if (event.keyCode == 13) setSearch(event.target.value)
   }
 
+  const handleUpdateVideo = async val => {
+    try {
+      await fetchApi({
+        url: 'get-auth-callback',
+        args: {...val, callbackType: 'updateVideo'},
+      })
+    } catch (e) {
+      setAlertOpen(true)
+    } finally {
+      mutateManajemenVideo()
+    }
+  }
+
   const headingList = [
     {label: ' '},
     {label: 'No.'},
@@ -154,21 +171,26 @@ const ManajemenVideoPage = () => {
             <DataTable
               headingList={headingList}
               filterComponents={
-                <div style={{display: 'flex', flexDirection: 'row'}}>
-                  <TextField
-                    size="small"
-                    placeholder="Cari berdasarkan Judul Video"
-                    variant="outlined"
-                    value={searchInput}
-                    onChange={e => setSearchInput(e.target.value)}
-                    onKeyDown={val => searchHandler(val)}
-                    sx={{pb: 1, px: 1.5}}
-                    fullWidth
-                    inputProps={{
-                      autoComplete: 'new-password',
-                    }}
-                  />
-                </div>
+                <>
+                  <Typography
+                    sx={{pl: 1.5, pb: 1.5}}
+                  >{`Total Video: ${data.count}`}</Typography>
+                  <div style={{display: 'flex', flexDirection: 'row'}}>
+                    <TextField
+                      size="small"
+                      placeholder="Cari berdasarkan Judul Video"
+                      variant="outlined"
+                      value={searchInput}
+                      onChange={e => setSearchInput(e.target.value)}
+                      onKeyDown={val => searchHandler(val)}
+                      sx={{pb: 1, px: 1.5}}
+                      fullWidth
+                      inputProps={{
+                        autoComplete: 'new-password',
+                      }}
+                    />
+                  </div>
+                </>
               }
             >
               {data.data.map((item, i) => (
@@ -204,7 +226,16 @@ const ManajemenVideoPage = () => {
                         timeout="auto"
                         unmountOnExit
                       >
-                        <ActionButton updateHandler={() => {}} />
+                        <ActionButton
+                          updateHandler={() => {
+                            setPreviousData({
+                              judul: item.judul,
+                              deskripsi: item.deskripsi,
+                              id: item.id,
+                            })
+                            setModalUpdateOpen(true)
+                          }}
+                        />
                       </Collapse>
                     </TableCell>
                   </TableRow>
@@ -235,6 +266,18 @@ const ManajemenVideoPage = () => {
         </InnerLayout>
       ) : null}
 
+      <FullPageWarning
+        label={'Gagal saat memuat data video, silakan coba kembali !!!'}
+        displayed={isError}
+      />
+
+      <Alert
+        label="Terjadi kesalahan saat update video, Silakan coba kembali !!!"
+        opened={alertOpen}
+        onClose={() => setAlertOpen(false)}
+        promptDialog
+      />
+
       <MainFloatingButton
         scrollToTop={scrollToTop}
         refreshPage={() => {
@@ -242,6 +285,20 @@ const ManajemenVideoPage = () => {
           mutateManajemenVideo()
         }}
       />
+
+      {modalUpdateOpen && !isError ? (
+        <ModalUpdateVideo
+          open={modalUpdateOpen}
+          previousData={previousData}
+          closeHandler={() => {
+            setModalUpdateOpen(false)
+          }}
+          getFormData={val => {
+            handleUpdateVideo(val)
+            setModalUpdateOpen(false)
+          }}
+        />
+      ) : null}
     </>
   )
 }

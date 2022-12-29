@@ -200,6 +200,7 @@ const Beranda = () => {
           ) : null}
         </InnerLayout>
       ) : null}
+
       <MainFloatingButton
         scrollToTop={scrollToTop}
         refreshPage={() => {

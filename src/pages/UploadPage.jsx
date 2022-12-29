@@ -151,7 +151,7 @@ const UploadPage = () => {
         </InnerLayout>
 
         <Alert
-          label="Terjadi kesalahan saat upload file Silakan coba kembali !!!"
+          label="Terjadi kesalahan saat upload file, Silakan coba kembali !!!"
           opened={alertOpen}
           onClose={() => setAlertOpen(false)}
           promptDialog

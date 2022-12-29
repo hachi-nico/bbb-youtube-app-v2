@@ -182,7 +182,7 @@ const UserPage = () => {
   }
 
   const getRoleName = role => {
-    return role == 1 ? 'Super user' : role == 2 ? 'Dosen' : 'Mahasiswa'
+    return role == 1 ? 'Super User' : role == 2 ? 'Dosen' : 'Mahasiswa'
   }
 
   const modifyUserHandler = async (val, action = 'menambahkan') => {
@@ -317,31 +317,37 @@ const UserPage = () => {
                       }`}
                     </TableCell>
                   </TableRow>
-                  <TableRow sx={{'& > *': {borderBottom: 'unset'}}}>
-                    <TableCell sx={{pb: 0, pt: 0}} colSpan={headingList.length}>
-                      <Collapse
-                        in={collapseOpen && i == collapseIndex}
-                        timeout="auto"
-                        unmountOnExit
+                  {item.tipe == 1 ? null : (
+                    <TableRow sx={{'& > *': {borderBottom: 'unset'}}}>
+                      <TableCell
+                        sx={{pb: 0, pt: 0}}
+                        colSpan={headingList.length}
                       >
-                        <ActionButton
-                          deleteHandler={() => {
-                            setDeleteAlertLabel(
-                              'Konfimasi untuk menghapus data user ' + item.nama
-                            )
-                            setDeleteAlert(data.users[i])
-                          }}
-                          updateHandler={() => {
-                            setPreviousFormData(data.users[i])
-                            setPageState(s => ({
-                              ...s,
-                              createUserModalOpened: true,
-                            }))
-                          }}
-                        />
-                      </Collapse>
-                    </TableCell>
-                  </TableRow>
+                        <Collapse
+                          in={collapseOpen && i == collapseIndex}
+                          timeout="auto"
+                          unmountOnExit
+                        >
+                          <ActionButton
+                            deleteHandler={() => {
+                              setDeleteAlertLabel(
+                                'Konfimasi untuk menghapus data user ' +
+                                  item.nama
+                              )
+                              setDeleteAlert(data.users[i])
+                            }}
+                            updateHandler={() => {
+                              setPreviousFormData(data.users[i])
+                              setPageState(s => ({
+                                ...s,
+                                createUserModalOpened: true,
+                              }))
+                            }}
+                          />
+                        </Collapse>
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </Fragment>
               ))}
             </DataTable>
