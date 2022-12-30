@@ -231,7 +231,7 @@ function MainLayout({children}) {
       {/* Section Bottom Nav Mobile */}
       <BottomNavigation
         sx={{
-          width: '100%',
+          width: '100vw',
           position: 'fixed',
           bottom: 0,
           bgcolor: indigo,
@@ -242,24 +242,27 @@ function MainLayout({children}) {
         }}
         value={navValue}
       >
-        {userMenuList.map((item, i) => (
-          <BottomNavigationAction
-            LinkComponent={RouterLink}
-            to={item.route}
-            key={i}
-            label={item.label}
-            value={item.label}
-            icon={item.icon}
-            sx={{color: 'white'}}
-            onClick={() => {
-              if (item.route == '/keluar') {
-                setPromptOpen(true)
-              } else {
-                handleNav(item.label)
-              }
-            }}
-          />
-        ))}
+        {userMenuList.map((item, i) => {
+          if (item.label == 'Upload') return null
+          return (
+            <BottomNavigationAction
+              LinkComponent={RouterLink}
+              to={item.route}
+              key={i}
+              label={item.label}
+              value={item.label}
+              icon={item.icon}
+              sx={{color: 'white'}}
+              onClick={() => {
+                if (item.route == '/keluar') {
+                  setPromptOpen(true)
+                } else {
+                  handleNav(item.label)
+                }
+              }}
+            />
+          )
+        })}
       </BottomNavigation>
     </Box>
   )
